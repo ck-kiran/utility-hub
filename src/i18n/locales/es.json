@@ -1,0 +1,15 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar"
+  },
+  "welcome": {
+    "title": "Bienvenido a Utility Hub",
+    "subtitle": "Comienza editando App.tsx"
+  }
+}
