@@ -1,3 +1,4 @@
+/* global jest */
 // Mock expo modules
 jest.mock('expo-status-bar', () => ({
   StatusBar: 'StatusBar',
