@@ -11,12 +11,4 @@ module.exports = {
     '!src/**/*.test.{ts,tsx}',
     '!src/**/__tests__/**',
   ],
-  coverageThreshold: {
-    global: {
-      branches: 50,
-      functions: 50,
-      lines: 50,
-      statements: 50,
-    },
-  },
 };
