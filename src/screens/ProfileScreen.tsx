@@ -14,8 +14,16 @@ export function ProfileScreen() {
     // TODO: Implement sign out
   };
 
+  const handleHelpCenter = () => {
+    navigation.navigate('HelpCenter');
+  };
+
   const handlePrivacyPolicy = () => {
     navigation.navigate('PrivacyPolicy');
+  };
+
+  const handleLanguage = () => {
+    navigation.navigate('LanguageSelection');
   };
 
   return (
@@ -39,6 +47,7 @@ export function ProfileScreen() {
           icon="language-outline"
           label="Language"
           value="English"
+          onPress={handleLanguage}
           testID="item-language"
         />
         <ProfileMenuItem
@@ -50,7 +59,12 @@ export function ProfileScreen() {
       </ProfileSection>
 
       <ProfileSection title="Support">
-        <ProfileMenuItem icon="help-circle-outline" label="Help Center" testID="item-help" />
+        <ProfileMenuItem
+          icon="help-circle-outline"
+          label="Help Center"
+          onPress={handleHelpCenter}
+          testID="item-help"
+        />
         <ProfileMenuItem
           icon="shield-checkmark-outline"
           label="Privacy Policy"

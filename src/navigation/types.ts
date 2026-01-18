@@ -7,6 +7,8 @@ export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<BottomTabParamList>;
   ToolDetail: { toolId: string; toolName: string };
   PrivacyPolicy: undefined;
+  HelpCenter: undefined;
+  LanguageSelection: undefined;
 };
 
 // Bottom Tabs
@@ -45,3 +47,5 @@ export type ProfileScreenProps = CompositeScreenProps<
 
 export type ToolDetailScreenProps = RootStackScreenProps<'ToolDetail'>;
 export type PrivacyPolicyScreenProps = RootStackScreenProps<'PrivacyPolicy'>;
+export type HelpCenterScreenProps = RootStackScreenProps<'HelpCenter'>;
+export type LanguageSelectionScreenProps = RootStackScreenProps<'LanguageSelection'>;
