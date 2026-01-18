@@ -36,7 +36,7 @@ export function RecentFileItem({
         <Ionicons name={fileConfig.icon} size={24} color={fileConfig.color} />
       </View>
       <View style={styles.content}>
-        <Text variant="body" weight="medium" numberOfLines={1}>
+        <Text variant="body" numberOfLines={1}>
           {fileName}
         </Text>
         <Text variant="caption" color={colors.text.tertiary}>
