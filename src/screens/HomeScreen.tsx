@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -61,9 +61,6 @@ export function HomeScreen() {
             </View>
             <Text variant="h3">UtilityHub</Text>
           </View>
-          <Pressable style={styles.settingsButton}>
-            <Ionicons name="settings-outline" size={24} color={colors.text.primary} />
-          </Pressable>
         </View>
 
         {/* Hero Section */}
@@ -149,9 +146,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing[2],
-  },
-  settingsButton: {
-    padding: spacing[2],
   },
   heroSection: {
     paddingVertical: spacing[6],
