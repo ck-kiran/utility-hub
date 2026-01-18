@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/common';
 import { SearchBar } from '@/components/tools';
 import { LanguageItem } from '@/components/language';
@@ -70,7 +71,9 @@ export function LanguageSelectionScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerSpacer} />
+          <Pressable onPress={handleDone} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+          </Pressable>
           <Text variant="h3" style={styles.headerTitle}>
             Language
           </Text>
@@ -162,7 +165,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
   },
-  headerSpacer: {
+  backButton: {
+    padding: spacing[2],
+    marginLeft: -spacing[2],
     width: 50,
   },
   headerTitle: {
@@ -171,6 +176,8 @@ const styles = StyleSheet.create({
   },
   doneButton: {
     padding: spacing[2],
+    width: 50,
+    alignItems: 'flex-end',
   },
   doneText: {
     fontWeight: '600',
