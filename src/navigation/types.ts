@@ -6,6 +6,8 @@ import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigat
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<BottomTabParamList>;
   ToolDetail: { toolId: string; toolName: string };
+  WordCounter: undefined;
+  CaseConverter: undefined;
 };
 
 // Bottom Tabs
@@ -43,3 +45,5 @@ export type ProfileScreenProps = CompositeScreenProps<
 >;
 
 export type ToolDetailScreenProps = RootStackScreenProps<'ToolDetail'>;
+export type WordCounterScreenProps = RootStackScreenProps<'WordCounter'>;
+export type CaseConverterScreenProps = RootStackScreenProps<'CaseConverter'>;

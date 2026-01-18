@@ -116,6 +116,16 @@ export function ToolsScreen() {
   }, [searchQuery]);
 
   const handleToolPress = (toolId: string, toolName: string) => {
+    // Navigate to specific tool screens for text tools
+    if (toolId === 'word-counter') {
+      navigation.navigate('WordCounter');
+      return;
+    }
+    if (toolId === 'case-converter') {
+      navigation.navigate('CaseConverter');
+      return;
+    }
+    // Default to generic tool detail screen
     navigation.navigate('ToolDetail', { toolId, toolName });
   };
 
