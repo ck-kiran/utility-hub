@@ -21,8 +21,10 @@ const SUGGESTED_LANGUAGES: Language[] = [
 
 const ALL_LANGUAGES: Language[] = [
   { code: 'hi', name: 'हिन्दी', localName: 'Hindi' },
+  { code: 'kn', name: 'ಕನ್ನಡ', localName: 'Kannada' },
   { code: 'ml', name: 'മലയാളം', localName: 'Malayalam' },
   { code: 'ta', name: 'தமிழ்', localName: 'Tamil' },
+  { code: 'te', name: 'తెలుగు', localName: 'Telugu' },
 ];
 
 export function LanguageSelectionScreen() {

@@ -12,8 +12,10 @@ const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English',
   es: 'Español',
   hi: 'हिन्दी',
+  kn: 'ಕನ್ನಡ',
   ml: 'മലയാളം',
   ta: 'தமிழ்',
+  te: 'తెలుగు',
 };
 
 export function ProfileScreen() {

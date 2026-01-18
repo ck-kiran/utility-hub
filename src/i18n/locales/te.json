@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "లోడ్ అవుతోంది...",
+    "error": "లోపం సంభవించింది",
+    "retry": "మళ్ళీ ప్రయత్నించండి",
+    "cancel": "రద్దు చేయండి",
+    "save": "సేవ్ చేయండి",
+    "delete": "తొలగించండి",
+    "confirm": "నిర్ధారించండి",
+    "upload_file": "ఫైల్‌ని అప్‌లోడ్ చేయండి",
+    "see_all": "అన్నీ చూడండి",
+    "recent_files": "ఇటీవలి ఫైళ్లు",
+    "clear": "క్లియర్",
+    "recent_activity": "ఇటీవలి కార్యకలాపాలు",
+    "history_subtitle": "మీ ప్రాసెసింగ్ చరిత్ర",
+    "library": "లైబ్రరీ",
+    "preferences": "ప్రాధాన్యతలు",
+    "support": "మద్దతు",
+    "sign_out": "సైన్ అవుట్",
+    "notifications": "నోటిఫికేషన్లు",
+    "language": "భాష",
+    "dark_mode": "డార్క్ మోడ్",
+    "help_center": "సహాయ కేంద్రం",
+    "privacy_policy": "గోప్యతా విధానం",
+    "popular_tools": "ప్రసిద్ధ సాధనాలు",
+    "hero_title": "మీ అన్ని ఫైల్ మరియు టెక్స్ట్ సాధనాలు",
+    "hero_subtitle": "సెకన్లలో ఫైల్‌లను మార్చండి, విలీనం చేయండి మరియు ఎడిట్ చేయండి. సరళమైనది మరియు వేగవంతమైనది."
+  },
+  "tabs": {
+    "home": "హోమ్",
+    "tools": "సాధనాలు",
+    "history": "చరిత్ర",
+    "profile": "ప్రొఫైల్"
+  },
+  "tools": {
+    "pdf_tools": "PDF సాధనాలు",
+    "image_tools": "చిత్ర సాధనాలు",
+    "text_tools": "టెక్స్ట్ సాధనాలు",
+    "dev_tools": "డెవలపర్ సాధనాలు",
+    "merge_pdf": "PDF విలీనం",
+    "merge_pdf_desc": "బహుళ ఫైళ్లను కలపండి",
+    "compress_pdf": "PDF కుదించు",
+    "compress_pdf_desc": "ఫైల్ పరిమాణాన్ని తగ్గించండి",
+    "image_to_pdf": "చిత్రం నుండి PDF",
+    "split_pdf": "PDF విభజించు",
+    "resize_image": "చిత్ర పరిమాణం మార్చు",
+    "resize_image_desc": "కొలతలు మార్చండి",
+    "convert_jpg": "JPG కి మార్చు",
+    "convert_jpg_desc": "ఫార్మాట్ మార్చండి",
+    "word_counter": "పదాల లెక్కింపు",
+    "word_counter_desc": "పదాలు & అక్షరాలను లెక్కించండి",
+    "case_converter": "కేస్ కన్వర్టర్",
+    "case_converter_desc": "UPPER, lower, Title",
+    "json_formatter": "JSON ఫార్మాటర్",
+    "json_formatter_desc": "కోడ్ అందంగా మార్చండి",
+    "color_picker": "రంగు ఎంపిక",
+    "color_picker_desc": "Hex & RGB పొందండి"
+  },
+  "welcome": {
+    "title": "Utility Hub కి స్వాగతం",
+    "subtitle": "App.tsx ని ఎడిట్ చేయడం ద్వారా ప్రారంభించండి"
+  }
+}
