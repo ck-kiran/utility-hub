@@ -10,3 +10,4 @@ export { WordCounterScreen } from './WordCounterScreen';
 export { CaseConverterScreen } from './CaseConverterScreen';
 export { JsonFormatterScreen } from './JsonFormatterScreen';
 export { MergePdfScreen } from './MergePdfScreen';
+export { ImageToPdfScreen } from './ImageToPdfScreen';

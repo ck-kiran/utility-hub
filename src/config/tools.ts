@@ -17,6 +17,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.image_to_pdf',
     descriptionKey: 'tools.image_to_pdf_desc',
     icon: 'image-outline',
+    route: 'ImageToPdf',
     themeColor: colors.error[500],
   },
   'pdf-to-image': {

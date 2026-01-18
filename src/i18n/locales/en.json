@@ -78,7 +78,13 @@
     "processing": "Processing...",
     "merge_complete": "Merge complete!",
     "at_least_two_files": "Please select at least 2 PDF files to merge.",
-    "drag_to_reorder": "Select multiple PDF files to combine them into a single document. Drag to reorder."
+    "drag_to_reorder": "Select multiple PDF files to combine them into a single document. Drag to reorder.",
+    "no_images_selected": "No images selected",
+    "add_more_images": "Add More Images",
+    "convert_to_pdf": "Convert to PDF",
+    "at_least_one_image": "Please select at least one image to convert.",
+    "select_images": "Select images to convert into a single PDF document. Images will be added in order.",
+    "pdf_quality": "PDF Quality"
   },
   "welcome": {
     "title": "Welcome to Utility Hub",
