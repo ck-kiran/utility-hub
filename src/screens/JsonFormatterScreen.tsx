@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -71,7 +71,7 @@ export function JsonFormatterScreen() {
               JSON Formatter
             </Text>
           </View>
-          <Pressable onPress={handleClear} style={styles.clearButton}>
+          <Pressable onPress={handleClear} style={styles.clearButton} testID="clear-button">
             <Ionicons name="trash-outline" size={24} color={colors.text.secondary} />
           </Pressable>
         </View>
