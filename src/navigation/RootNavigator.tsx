@@ -5,6 +5,7 @@ import {
   ToolDetailScreen,
   WordCounterScreen,
   CaseConverterScreen,
+  JsonFormatterScreen,
   PrivacyPolicyScreen,
   HelpCenterScreen,
   LanguageSelectionScreen,
@@ -20,6 +21,7 @@ export function RootNavigator() {
       <Stack.Screen name="ToolDetail" component={ToolDetailScreen} />
       <Stack.Screen name="WordCounter" component={WordCounterScreen} />
       <Stack.Screen name="CaseConverter" component={CaseConverterScreen} />
+      <Stack.Screen name="JsonFormatter" component={JsonFormatterScreen} />
       <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
