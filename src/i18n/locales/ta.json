@@ -32,6 +32,10 @@
     "history": "வரலாறு",
     "profile": "சுயவிவரம்"
   },
+  "history": {
+    "today": "இன்று",
+    "yesterday": "நேற்று"
+  },
   "tools": {
     "pdf_tools": "PDF கருவிகள்",
     "image_tools": "படக் கருவிகள்",

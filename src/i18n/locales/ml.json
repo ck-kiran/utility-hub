@@ -32,6 +32,10 @@
     "history": "ചരിത്രം",
     "profile": "പ്രൊഫൈൽ"
   },
+  "history": {
+    "today": "ഇന്ന്",
+    "yesterday": "ഇന്നലെ"
+  },
   "tools": {
     "pdf_tools": "PDF ടൂളുകൾ",
     "image_tools": "ചിത്ര ടൂളുകൾ",

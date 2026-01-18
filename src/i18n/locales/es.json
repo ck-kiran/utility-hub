@@ -32,6 +32,10 @@
     "history": "Historial",
     "profile": "Perfil"
   },
+  "history": {
+    "today": "HOY",
+    "yesterday": "AYER"
+  },
   "tools": {
     "pdf_tools": "Herramientas PDF",
     "image_tools": "Herramientas de Imagen",
