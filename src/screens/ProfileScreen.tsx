@@ -1,14 +1,21 @@
 import React from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '@/components/common';
 import { ProfileHeader, ProfileSection, ProfileMenuItem } from '@/components/profile';
 import { colors, spacing } from '@/theme';
+import type { ProfileScreenProps } from '@/navigation';
 
 export function ProfileScreen() {
+  const navigation = useNavigation<ProfileScreenProps['navigation']>();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
 
   const handleSignOut = () => {
     // TODO: Implement sign out
+  };
+
+  const handleLanguage = () => {
+    navigation.navigate('LanguageSelection');
   };
 
   return (
@@ -32,6 +39,7 @@ export function ProfileScreen() {
           icon="language-outline"
           label="Language"
           value="English"
+          onPress={handleLanguage}
           testID="item-language"
         />
         <ProfileMenuItem
