@@ -69,6 +69,17 @@
     "color_picker": "Color Picker",
     "color_picker_desc": "Get Hex & RGB"
   },
+  "pdf": {
+    "select_files": "Select Files",
+    "add_pdf_files": "Add PDF Files",
+    "no_files_selected": "No PDF files selected",
+    "merge_pdfs": "Merge PDFs",
+    "save_share": "Save & Share",
+    "processing": "Processing...",
+    "merge_complete": "Merge complete!",
+    "at_least_two_files": "Please select at least 2 PDF files to merge.",
+    "drag_to_reorder": "Select multiple PDF files to combine them into a single document. Drag to reorder."
+  },
   "welcome": {
     "title": "Welcome to Utility Hub",
     "subtitle": "Get started by editing App.tsx"

@@ -9,6 +9,7 @@ export type RootStackParamList = {
   WordCounter: undefined;
   CaseConverter: undefined;
   JsonFormatter: undefined;
+  MergePdf: undefined;
   PrivacyPolicy: undefined;
   HelpCenter: undefined;
   LanguageSelection: undefined;
@@ -55,3 +56,4 @@ export type LanguageSelectionScreenProps = RootStackScreenProps<'LanguageSelecti
 export type WordCounterScreenProps = RootStackScreenProps<'WordCounter'>;
 export type CaseConverterScreenProps = RootStackScreenProps<'CaseConverter'>;
 export type JsonFormatterScreenProps = RootStackScreenProps<'JsonFormatter'>;
+export type MergePdfScreenProps = RootStackScreenProps<'MergePdf'>;
