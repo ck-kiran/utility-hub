@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, Button } from '@/components/common';
 import { FileUploadCard, ConfigurationCard, OptionTabs, InfoBox } from '@/components/tool-detail';
 import { colors, spacing } from '@/theme';
+import type { ToolDetailScreenProps } from '@/navigation';
 
 const COMPRESSION_OPTIONS = [
   { id: 'high', label: 'High Quality' },
@@ -21,6 +23,10 @@ const COMPRESSION_INFO: Record<string, string> = {
 };
 
 export function ToolDetailScreen() {
+  const navigation = useNavigation<ToolDetailScreenProps['navigation']>();
+  const route = useRoute<ToolDetailScreenProps['route']>();
+  const { toolName } = route.params;
+
   const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [compressionLevel, setCompressionLevel] = useState('balanced');
   const [sliderValue, setSliderValue] = useState(0.5);
@@ -35,7 +41,7 @@ export function ToolDetailScreen() {
   };
 
   const handleBack = () => {
-    // TODO: Navigate back
+    navigation.goBack();
   };
 
   const handleCompressionChange = (id: string) => {
@@ -62,7 +68,7 @@ export function ToolDetailScreen() {
             <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
           </Pressable>
           <Text variant="h3" style={styles.headerTitle}>
-            Compress PDF
+            {toolName}
           </Text>
           <View style={styles.headerSpacer} />
         </View>
