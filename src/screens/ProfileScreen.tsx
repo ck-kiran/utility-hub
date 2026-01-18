@@ -1,14 +1,29 @@
 import React from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '@/components/common';
 import { ProfileHeader, ProfileSection, ProfileMenuItem } from '@/components/profile';
 import { colors, spacing } from '@/theme';
+import type { ProfileScreenProps } from '@/navigation';
 
 export function ProfileScreen() {
+  const navigation = useNavigation<ProfileScreenProps['navigation']>();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
 
   const handleSignOut = () => {
     // TODO: Implement sign out
+  };
+
+  const handleHelpCenter = () => {
+    navigation.navigate('HelpCenter');
+  };
+
+  const handlePrivacyPolicy = () => {
+    navigation.navigate('PrivacyPolicy');
+  };
+
+  const handleLanguage = () => {
+    navigation.navigate('LanguageSelection');
   };
 
   return (
@@ -32,6 +47,7 @@ export function ProfileScreen() {
           icon="language-outline"
           label="Language"
           value="English"
+          onPress={handleLanguage}
           testID="item-language"
         />
         <ProfileMenuItem
@@ -43,10 +59,16 @@ export function ProfileScreen() {
       </ProfileSection>
 
       <ProfileSection title="Support">
-        <ProfileMenuItem icon="help-circle-outline" label="Help Center" testID="item-help" />
+        <ProfileMenuItem
+          icon="help-circle-outline"
+          label="Help Center"
+          onPress={handleHelpCenter}
+          testID="item-help"
+        />
         <ProfileMenuItem
           icon="shield-checkmark-outline"
           label="Privacy Policy"
+          onPress={handlePrivacyPolicy}
           testID="item-privacy"
         />
       </ProfileSection>

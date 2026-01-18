@@ -8,6 +8,9 @@ export type RootStackParamList = {
   ToolDetail: { toolId: string; toolName: string };
   WordCounter: undefined;
   CaseConverter: undefined;
+  PrivacyPolicy: undefined;
+  HelpCenter: undefined;
+  LanguageSelection: undefined;
 };
 
 // Bottom Tabs
@@ -45,5 +48,8 @@ export type ProfileScreenProps = CompositeScreenProps<
 >;
 
 export type ToolDetailScreenProps = RootStackScreenProps<'ToolDetail'>;
+export type PrivacyPolicyScreenProps = RootStackScreenProps<'PrivacyPolicy'>;
+export type HelpCenterScreenProps = RootStackScreenProps<'HelpCenter'>;
+export type LanguageSelectionScreenProps = RootStackScreenProps<'LanguageSelection'>;
 export type WordCounterScreenProps = RootStackScreenProps<'WordCounter'>;
 export type CaseConverterScreenProps = RootStackScreenProps<'CaseConverter'>;
