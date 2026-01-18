@@ -8,14 +8,8 @@ import { ToolCard, RecentFileItem, SectionHeader } from '@/components/home';
 import { colors, spacing } from '@/theme';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
+import { getPopularTools } from '@/config/tools';
 import type { HomeScreenProps } from '@/navigation';
-
-const POPULAR_TOOLS = [
-  { id: '1', labelKey: 'tools.merge_pdf', icon: 'git-merge-outline' as const },
-  { id: '2', labelKey: 'tools.image_to_pdf', icon: 'image-outline' as const },
-  { id: '3', labelKey: 'tools.compress_pdf', icon: 'resize-outline' as const },
-  { id: '4', labelKey: 'tools.split_pdf', icon: 'cut-outline' as const },
-];
 
 const RECENT_FILES = [
   {
@@ -37,6 +31,7 @@ const RECENT_FILES = [
 export function HomeScreen() {
   const navigation = useNavigation<HomeScreenProps['navigation']>();
   useAppStore((state) => state.language);
+  const popularTools = getPopularTools();
 
   const handleUpload = () => {
     // TODO: Implement file upload
@@ -90,12 +85,12 @@ export function HomeScreen() {
             onActionPress={handleSeeAllTools}
           />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.toolsScroll}>
-            {POPULAR_TOOLS.map((tool) => (
+            {popularTools.map((tool) => (
               <ToolCard
                 key={tool.id}
-                label={t(tool.labelKey)}
+                label={t(tool.titleKey)}
                 icon={<Ionicons name={tool.icon} size={28} color={colors.primary[500]} />}
-                onPress={() => handleToolPress(tool.id, t(tool.labelKey))}
+                onPress={() => handleToolPress(tool.id, t(tool.titleKey))}
               />
             ))}
           </ScrollView>
