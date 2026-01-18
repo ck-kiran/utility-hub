@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen, ToolsScreen, HistoryScreen, ProfileScreen } from '@/screens';
 import { colors } from '@/theme';
@@ -32,6 +33,7 @@ const TAB_ICONS: Record<
 
 export function BottomTabNavigator() {
   useAppStore((state) => state.language);
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -49,8 +51,8 @@ export function BottomTabNavigator() {
           borderTopColor: colors.border,
           borderTopWidth: 1,
           paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-          height: Platform.OS === 'ios' ? 88 : 60,
+          paddingBottom: Math.max(insets.bottom, 8),
+          height: 60 + Math.max(insets.bottom, 0),
         },
         tabBarLabelStyle: {
           fontSize: 12,
