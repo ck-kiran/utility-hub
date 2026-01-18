@@ -3,18 +3,30 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/common';
 import { colors, spacing, borderRadius } from '@/theme';
+import { hexToRgba } from '@/utils/colors';
 
 interface ToolListItemProps {
-  icon: React.ReactNode;
+  icon: keyof typeof Ionicons.glyphMap;
   title: string;
   description: string;
+  themeColor?: string;
   onPress?: () => void;
 }
 
-export function ToolListItem({ icon, title, description, onPress }: ToolListItemProps) {
+export function ToolListItem({
+  icon,
+  title,
+  description,
+  themeColor = colors.primary[500],
+  onPress,
+}: ToolListItemProps) {
+  const backgroundColor = hexToRgba(themeColor, 0.1);
+
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <View style={styles.iconContainer}>{icon}</View>
+      <View style={[styles.iconContainer, { backgroundColor }]}>
+        <Ionicons name={icon} size={24} color={themeColor} />
+      </View>
       <View style={styles.content}>
         <Text variant="body">{title}</Text>
         <Text variant="caption" color={colors.text.tertiary}>
@@ -37,7 +49,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing[3],

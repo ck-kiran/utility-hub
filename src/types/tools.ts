@@ -22,6 +22,7 @@ export interface Tool {
   icon: keyof typeof Ionicons.glyphMap;
   route?: string; // Specific route name if different from generic ToolDetail
   isPopular?: boolean;
+  themeColor?: string;
 }
 
 export interface ToolCategory {
