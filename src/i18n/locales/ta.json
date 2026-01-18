@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "ஏற்றுகிறது...",
+    "error": "பிழை ஏற்பட்டது",
+    "retry": "மீண்டும் முயற்சிக்கவும்",
+    "cancel": "ரத்துசெய்",
+    "save": "சேமி",
+    "delete": "நீக்கு",
+    "confirm": "உறுதிப்படுத்து",
+    "upload_file": "கோப்பை பதிவேற்றவும்",
+    "see_all": "அனைத்தையும் பார்",
+    "recent_files": "சமீபத்திய கோப்புகள்",
+    "clear": "அழி",
+    "recent_activity": "சமீபத்திய செயல்பாடு",
+    "history_subtitle": "உங்கள் செயலாக்க வரலாறு",
+    "library": "நூலகம்",
+    "preferences": "விருப்பங்கள்",
+    "support": "ஆதரவு",
+    "sign_out": "வெளியேறு",
+    "notifications": "அறிவிப்புகள்",
+    "language": "மொழி",
+    "dark_mode": "டார்க் மோட்",
+    "help_center": "உதவி மையம்",
+    "privacy_policy": "தனியுரிமைக் கொள்கை",
+    "popular_tools": "பிரபலமான கருவிகள்",
+    "hero_title": "உங்கள் அனைத்து கோப்பு & உரை கருவிகள்",
+    "hero_subtitle": "வினாடிகளில் கோப்புகளை மாற்றவும், இணைக்கவும் மற்றும் திருத்தவும். எளிமையானது மற்றும் வேகமானது."
+  },
+  "tabs": {
+    "home": "முகப்பு",
+    "tools": "கருவிகள்",
+    "history": "வரலாறு",
+    "profile": "சுயவிவரம்"
+  },
+  "tools": {
+    "pdf_tools": "PDF கருவிகள்",
+    "image_tools": "பட கருவிகள்",
+    "text_tools": "உரை கருவிகள்",
+    "dev_tools": "டெவலப்பர் கருவிகள்",
+    "merge_pdf": "PDF இணைக்கவும்",
+    "merge_pdf_desc": "பல கோப்புகளை இணைக்கவும்",
+    "compress_pdf": "PDF சுருக்கவும்",
+    "compress_pdf_desc": "கோப்பு அளவைக் குறைக்கவும்",
+    "image_to_pdf": "படம் PDF-க்கு",
+    "split_pdf": "PDF பிரிக்கவும்",
+    "resize_image": "படத்தின் அளவை மாற்றவும்",
+    "resize_image_desc": "பரிமாணங்களை மாற்றவும்",
+    "convert_jpg": "JPG-க்கு மாற்றவும்",
+    "convert_jpg_desc": "வடிவத்தை மாற்றவும்",
+    "word_counter": "வார்த்தை கவுண்டர்",
+    "word_counter_desc": "வார்த்தைகள் & எழுத்துக்கள்",
+    "case_converter": "கேஸ் மாற்றி",
+    "case_converter_desc": "பெரிய எழுத்து, சிறிய எழுத்து",
+    "json_formatter": "JSON வடிவமைப்பு",
+    "json_formatter_desc": "குறியீட்டை அழகாக்குங்கள்",
+    "color_picker": "வண்ணத் தேர்வி",
+    "color_picker_desc": "Hex & RGB பெறவும்"
+  },
+  "welcome": {
+    "title": "Utility Hub-க்கு வரவேற்கிறோம்",
+    "subtitle": "App.tsx-ஐ திருத்தி தொடங்கவும்"
+  }
+}

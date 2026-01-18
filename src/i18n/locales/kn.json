@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    "error": "ದೋಷ ಸಂಭವಿಸಿದೆ",
+    "retry": "ಮರುಪ್ರಯತ್ನಿಸಿ",
+    "cancel": "ರದ್ದುಮಾಡಿ",
+    "save": "ಉಳಿಸಿ",
+    "delete": "ಅಳಿಸಿ",
+    "confirm": "ಖಚಿತಪಡಿಸಿ",
+    "upload_file": "ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+    "see_all": "ಎಲ್ಲವನ್ನೂ ನೋಡಿ",
+    "recent_files": "ಇತ್ತೀಚಿನ ಫೈಲ್‌ಗಳು",
+    "clear": "ಅಳಿಸಿ",
+    "recent_activity": "ಇತ್ತೀಚಿನ ಚಟುವಟಿಕೆ",
+    "history_subtitle": "ನಿಮ್ಮ ಪ್ರಕ್ರಿಯೆಯ ಇತಿಹಾಸ",
+    "library": "ಲೈಬ್ರರಿ",
+    "preferences": "ಆದ್ಯತೆಗಳು",
+    "support": "ಬೆಂಬಲ",
+    "sign_out": "ಸೈನ್ ಔಟ್",
+    "notifications": "ಅಧಿಸೂಚನೆಗಳು",
+    "language": "ಭಾಷೆ",
+    "dark_mode": "ಡಾರ್ಕ್ ಮೋಡ್",
+    "help_center": "ಸಹಾಯ ಕೇಂದ್ರ",
+    "privacy_policy": "ಗೌಪ್ಯತಾ ನೀತಿ",
+    "popular_tools": "ಜನಪ್ರಿಯ ಪರಿಕರಗಳು",
+    "hero_title": "ನಿಮ್ಮ ಎಲ್ಲಾ ಫೈಲ್ ಮತ್ತು ಪಠ್ಯ ಪರಿಕರಗಳು",
+    "hero_subtitle": "ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಫೈಲ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಿ, ವಿಲೀನಗೊಳಿಸಿ ಮತ್ತು ಎಡಿಟ್ ಮಾಡಿ. ಸರಳ ಮತ್ತು ವೇಗ."
+  },
+  "tabs": {
+    "home": "ಮುಖಪುಟ",
+    "tools": "ಪರಿಕರಗಳು",
+    "history": "ಇತಿಹಾಸ",
+    "profile": "ಪ್ರೊಫೈಲ್"
+  },
+  "tools": {
+    "pdf_tools": "PDF ಪರಿಕರಗಳು",
+    "image_tools": "ಚಿತ್ರ ಪರಿಕರಗಳು",
+    "text_tools": "ಪಠ್ಯ ಪರಿಕರಗಳು",
+    "dev_tools": "ಡೆವಲಪರ್ ಪರಿಕರಗಳು",
+    "merge_pdf": "PDF ವಿಲೀನಗೊಳಿಸಿ",
+    "merge_pdf_desc": "ಹಲವು ಫೈಲ್‌ಗಳನ್ನು ಸೇರಿಸಿ",
+    "compress_pdf": "PDF ಸಂಕುಚಿತಗೊಳಿಸಿ",
+    "compress_pdf_desc": "ಫೈಲ್ ಗಾತ್ರವನ್ನು ಕಡಿಮೆ ಮಾಡಿ",
+    "image_to_pdf": "ಚಿತ್ರದಿಂದ PDF",
+    "split_pdf": "PDF ವಿಭಜಿಸಿ",
+    "resize_image": "ಚಿತ್ರದ ಗಾತ್ರ ಬದಲಿಸಿ",
+    "resize_image_desc": "ಆಯಾಮಗಳನ್ನು ಬದಲಿಸಿ",
+    "convert_jpg": "JPG ಗೆ ಪರಿವರ್ತಿಸಿ",
+    "convert_jpg_desc": "ಫಾರ್ಮ್ಯಾಟ್ ಬದಲಿಸಿ",
+    "word_counter": "ಪದ ಎಣಿಕೆ",
+    "word_counter_desc": "ಪದಗಳು ಮತ್ತು ಅಕ್ಷರಗಳನ್ನು ಎಣಿಸಿ",
+    "case_converter": "ಕೇಸ್ ಪರಿವರ್ತಕ",
+    "case_converter_desc": "ದೊಡ್ಡ ಅಕ್ಷರ, ಚಿಕ್ಕ ಅಕ್ಷರ, ಶೀರ್ಷಿಕೆ",
+    "json_formatter": "JSON ಫಾರ್ಮ್ಯಾಟರ್",
+    "json_formatter_desc": "ಕೋಡ್ ಅಂದಗೊಳಿಸಿ",
+    "color_picker": "ಬಣ್ಣ ಆಯ್ಕೆಗಾರ",
+    "color_picker_desc": "Hex ಮತ್ತು RGB ಪಡೆಯಿರಿ"
+  },
+  "welcome": {
+    "title": "Utility Hub ಗೆ ಸುಸ್ವಾಗತ",
+    "subtitle": "App.tsx ಅನ್ನು ಎಡಿಟ್ ಮಾಡುವ ಮೂಲಕ ಪ್ರಾರಂಭಿಸಿ"
+  }
+}

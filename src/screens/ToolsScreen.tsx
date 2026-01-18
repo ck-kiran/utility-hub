@@ -6,90 +6,92 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/common';
 import { SearchBar, ToolListItem, ToolCategory } from '@/components/tools';
 import { colors, spacing } from '@/theme';
+import { t } from '@/i18n';
+import { useAppStore } from '@/store';
 import type { ToolsScreenProps } from '@/navigation';
 
 interface Tool {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: keyof typeof Ionicons.glyphMap;
 }
 
 interface ToolCategoryData {
   id: string;
-  title: string;
+  titleKey: string;
   tools: Tool[];
 }
 
 const TOOL_CATEGORIES: ToolCategoryData[] = [
   {
     id: 'pdf',
-    title: 'PDF Tools',
+    titleKey: 'tools.pdf_tools',
     tools: [
       {
         id: 'merge-pdf',
-        title: 'Merge PDF',
-        description: 'Combine multiple files',
+        titleKey: 'tools.merge_pdf',
+        descriptionKey: 'tools.merge_pdf_desc',
         icon: 'git-merge-outline',
       },
       {
         id: 'compress-pdf',
-        title: 'Compress PDF',
-        description: 'Reduce file size',
+        titleKey: 'tools.compress_pdf',
+        descriptionKey: 'tools.compress_pdf_desc',
         icon: 'resize-outline',
       },
     ],
   },
   {
     id: 'image',
-    title: 'Image Tools',
+    titleKey: 'tools.image_tools',
     tools: [
       {
         id: 'resize-image',
-        title: 'Resize Image',
-        description: 'Change dimensions',
+        titleKey: 'tools.resize_image',
+        descriptionKey: 'tools.resize_image_desc',
         icon: 'expand-outline',
       },
       {
         id: 'convert-jpg',
-        title: 'Convert to JPG',
-        description: 'Change format',
+        titleKey: 'tools.convert_jpg',
+        descriptionKey: 'tools.convert_jpg_desc',
         icon: 'image-outline',
       },
     ],
   },
   {
     id: 'text',
-    title: 'Text Tools',
+    titleKey: 'tools.text_tools',
     tools: [
       {
         id: 'word-counter',
-        title: 'Word Counter',
-        description: 'Count words & chars',
+        titleKey: 'tools.word_counter',
+        descriptionKey: 'tools.word_counter_desc',
         icon: 'list-outline',
       },
       {
         id: 'case-converter',
-        title: 'Case Converter',
-        description: 'UPPER, lower, Title',
+        titleKey: 'tools.case_converter',
+        descriptionKey: 'tools.case_converter_desc',
         icon: 'text-outline',
       },
     ],
   },
   {
     id: 'developer',
-    title: 'Developer Tools',
+    titleKey: 'tools.dev_tools',
     tools: [
       {
         id: 'json-formatter',
-        title: 'JSON Formatter',
-        description: 'Prettify code',
+        titleKey: 'tools.json_formatter',
+        descriptionKey: 'tools.json_formatter_desc',
         icon: 'code-slash-outline',
       },
       {
         id: 'color-picker',
-        title: 'Color Picker',
-        description: 'Get Hex & RGB',
+        titleKey: 'tools.color_picker',
+        descriptionKey: 'tools.color_picker_desc',
         icon: 'color-palette-outline',
       },
     ],
@@ -99,6 +101,7 @@ const TOOL_CATEGORIES: ToolCategoryData[] = [
 export function ToolsScreen() {
   const navigation = useNavigation<ToolsScreenProps['navigation']>();
   const [searchQuery, setSearchQuery] = useState('');
+  useAppStore((state) => state.language);
 
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -108,10 +111,11 @@ export function ToolsScreen() {
     const query = searchQuery.toLowerCase();
     return TOOL_CATEGORIES.map((category) => ({
       ...category,
-      tools: category.tools.filter(
-        (tool) =>
-          tool.title.toLowerCase().includes(query) || tool.description.toLowerCase().includes(query)
-      ),
+      tools: category.tools.filter((tool) => {
+        const title = t(tool.titleKey).toLowerCase();
+        const description = t(tool.descriptionKey).toLowerCase();
+        return title.includes(query) || description.includes(query);
+      }),
     })).filter((category) => category.tools.length > 0);
   }, [searchQuery]);
 
@@ -138,7 +142,7 @@ export function ToolsScreen() {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text variant="h1">Library</Text>
+          <Text variant="h1">{t('common.library')}</Text>
           <Pressable onPress={handleHistoryPress} style={styles.historyButton}>
             <Ionicons name="time-outline" size={24} color={colors.text.primary} />
           </Pressable>
@@ -149,14 +153,14 @@ export function ToolsScreen() {
 
         {/* Tool Categories */}
         {filteredCategories.map((category) => (
-          <ToolCategory key={category.id} title={category.title}>
+          <ToolCategory key={category.id} title={t(category.titleKey)}>
             {category.tools.map((tool, index) => (
               <React.Fragment key={tool.id}>
                 <ToolListItem
                   icon={<Ionicons name={tool.icon} size={22} color={colors.primary[500]} />}
-                  title={tool.title}
-                  description={tool.description}
-                  onPress={() => handleToolPress(tool.id, tool.title)}
+                  title={t(tool.titleKey)}
+                  description={t(tool.descriptionKey)}
+                  onPress={() => handleToolPress(tool.id, t(tool.titleKey))}
                 />
                 {index < category.tools.length - 1 && <View style={styles.divider} />}
               </React.Fragment>

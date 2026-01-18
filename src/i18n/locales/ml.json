@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "ലോഡ് ചെയ്യുന്നു...",
+    "error": "ഒരു പിശക് സംഭവിച്ചു",
+    "retry": "വീണ്ടും ശ്രമിക്കുക",
+    "cancel": "റദ്ദാക്കുക",
+    "save": "സേവ് ചെയ്യുക",
+    "delete": "നീക്കം ചെയ്യുക",
+    "confirm": "സ്ഥിരീകരിക്കുക",
+    "upload_file": "ഫയൽ അപ്‌ലോഡ്",
+    "see_all": "എല്ലാം കാണുക",
+    "recent_files": "സമീപകാല ഫയലുകൾ",
+    "clear": "വൃത്തിയാക്കുക",
+    "recent_activity": "സമീപകാല പ്രവർത്തനം",
+    "history_subtitle": "നിങ്ങളുടെ പ്രോസസ്സിംഗ് ചരിത്രം",
+    "library": "ലൈബ്രറി",
+    "preferences": "മുൻഗണനകൾ",
+    "support": "പിന്തുണ",
+    "sign_out": "പുറത്തുകടക്കുക",
+    "notifications": "അറിയിപ്പുകൾ",
+    "language": "ഭാഷ",
+    "dark_mode": "ഡാർക്ക് മോഡ്",
+    "help_center": "സഹായ കേന്ദ്രം",
+    "privacy_policy": "സ്വകാര്യതാ നയം",
+    "popular_tools": "ജനപ്രിയ ടൂളുകൾ",
+    "hero_title": "നിങ്ങളുടെ എല്ലാ ഫയൽ & ടെക്സ്റ്റ് ടൂളുകൾ",
+    "hero_subtitle": "നിമിഷങ്ങൾക്കുള്ളിൽ ഫയലുകൾ മാറ്റുക, ലയിപ്പിക്കുക, എഡിറ്റ് ചെയ്യുക. ലളിതവും വേഗത്തിലുള്ളതും."
+  },
+  "tabs": {
+    "home": "ഹോം",
+    "tools": "ടൂളുകൾ",
+    "history": "ചരിത്രം",
+    "profile": "പ്രൊഫൈൽ"
+  },
+  "tools": {
+    "pdf_tools": "PDF ടൂളുകൾ",
+    "image_tools": "ഇമേജ് ടൂളുകൾ",
+    "text_tools": "ടെക്സ്റ്റ് ടൂളുകൾ",
+    "dev_tools": "ഡെവലപ്പർ ടൂളുകൾ",
+    "merge_pdf": "PDF ലയിപ്പിക്കുക",
+    "merge_pdf_desc": "ഒന്നിലധികം ഫയലുകൾ സംയോജിപ്പിക്കുക",
+    "compress_pdf": "PDF കംപ്രസ് ചെയ്യുക",
+    "compress_pdf_desc": "ഫയൽ വലുപ്പം കുറയ്ക്കുക",
+    "image_to_pdf": "ഇമേജ് ടു PDF",
+    "split_pdf": "PDF വിഭജിക്കുക",
+    "resize_image": "ഇമേജ് വലുപ്പം മാറ്റുക",
+    "resize_image_desc": "അളവുകൾ മാറ്റുക",
+    "convert_jpg": "JPG ലേക്ക് മാറ്റുക",
+    "convert_jpg_desc": "ഫോർമാറ്റ് മാറ്റുക",
+    "word_counter": "വേർഡ് കൗണ്ടർ",
+    "word_counter_desc": "വാക്കുകളും അക്ഷരങ്ങളും",
+    "case_converter": "കേസ് കൺവെർട്ടർ",
+    "case_converter_desc": "വലിയക്ഷരം, ചെറിയക്ഷരം",
+    "json_formatter": "JSON ഫോർമാറ്റർ",
+    "json_formatter_desc": "കോഡ് മനോഹരമാക്കുക",
+    "color_picker": "കളർ പിക്കർ",
+    "color_picker_desc": "Hex & RGB നേടുക"
+  },
+  "welcome": {
+    "title": "യൂട്ടിലിറ്റി ഹബ്ബിലേക്ക് സ്വാഗതം",
+    "subtitle": "App.tsx എഡിറ്റ് ചെയ്‌ത് ആരംഭിക്കുക"
+  }
+}

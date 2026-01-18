@@ -1,0 +1,63 @@
+{
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "retry": "पुनः प्रयास करें",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "delete": "हटाएं",
+    "confirm": "पुष्टि करें",
+    "upload_file": "फाइल अपलोड करें",
+    "see_all": "सभी देखें",
+    "recent_files": "हाल की फाइलें",
+    "clear": "साफ़ करें",
+    "recent_activity": "हाल की गतिविधि",
+    "history_subtitle": "आपका प्रसंस्करण इतिहास",
+    "library": "लाइब्रेरी",
+    "preferences": "प्राथमिकताएं",
+    "support": "सहायता",
+    "sign_out": "साइन आउट",
+    "notifications": "सूचनाएं",
+    "language": "भाषा",
+    "dark_mode": "डार्क मोड",
+    "help_center": "सहायता केंद्र",
+    "privacy_policy": "गोपनीयता नीति",
+    "popular_tools": "लोकप्रिय उपकरण",
+    "hero_title": "आपके सभी फ़ाइल और टेक्स्ट उपकरण",
+    "hero_subtitle": "सेकंड में फ़ाइलों को बदलें, मर्ज करें और संपादित करें। सरल और तेज।"
+  },
+  "tabs": {
+    "home": "होम",
+    "tools": "टूल्स",
+    "history": "इतिहास",
+    "profile": "प्रोफ़ाइल"
+  },
+  "tools": {
+    "pdf_tools": "पीडीएफ उपकरण",
+    "image_tools": "छवि उपकरण",
+    "text_tools": "पाठ उपकरण",
+    "dev_tools": "डेवलपर उपकरण",
+    "merge_pdf": "पीडीएफ मर्ज करें",
+    "merge_pdf_desc": "कई फ़ाइलों को मिलाएं",
+    "compress_pdf": "पीडीएफ संपीड़ित करें",
+    "compress_pdf_desc": "फ़ाइल का आकार कम करें",
+    "image_to_pdf": "छवि से पीडीएफ",
+    "split_pdf": "पीडीएफ विभाजित करें",
+    "resize_image": "छवि का आकार बदलें",
+    "resize_image_desc": "आयाम बदलें",
+    "convert_jpg": "जेपीजी में बदलें",
+    "convert_jpg_desc": "प्रारूप बदलें",
+    "word_counter": "शब्द गणक",
+    "word_counter_desc": "शब्द और अक्षर गिनें",
+    "case_converter": "केस कनवर्टर",
+    "case_converter_desc": "अपर, लोअर, टाइटल",
+    "json_formatter": "JSON फॉर्मेटर",
+    "json_formatter_desc": "कोड को सुंदर बनाएं",
+    "color_picker": "रंग चयनकर्ता",
+    "color_picker_desc": "हेक्स और आरजीबी प्राप्त करें"
+  },
+  "welcome": {
+    "title": "Utility Hub में आपका स्वागत है",
+    "subtitle": "App.tsx को संपादित करके शुरुआत करें"
+  }
+}
