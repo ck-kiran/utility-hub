@@ -12,6 +12,7 @@ export type RootStackParamList = {
   MergePdf: undefined;
   ImageToPdf: undefined;
   PdfToImage: undefined;
+  SplitPdf: undefined;
   PrivacyPolicy: undefined;
   HelpCenter: undefined;
   LanguageSelection: undefined;
@@ -61,3 +62,4 @@ export type JsonFormatterScreenProps = RootStackScreenProps<'JsonFormatter'>;
 export type MergePdfScreenProps = RootStackScreenProps<'MergePdf'>;
 export type ImageToPdfScreenProps = RootStackScreenProps<'ImageToPdf'>;
 export type PdfToImageScreenProps = RootStackScreenProps<'PdfToImage'>;
+export type SplitPdfScreenProps = RootStackScreenProps<'SplitPdf'>;
