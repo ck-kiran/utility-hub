@@ -74,9 +74,10 @@ export function ToolsScreen() {
             {category.tools.map((tool, index) => (
               <React.Fragment key={tool.id}>
                 <ToolListItem
-                  icon={<Ionicons name={tool.icon} size={22} color={colors.primary[500]} />}
+                  icon={tool.icon}
                   title={t(tool.titleKey)}
                   description={t(tool.descriptionKey)}
+                  themeColor={tool.themeColor}
                   onPress={() => handleToolPress(tool.id, t(tool.titleKey))}
                 />
                 {index < category.tools.length - 1 && <View style={styles.divider} />}
