@@ -6,3 +6,5 @@ export { ToolDetailScreen } from './ToolDetailScreen';
 export { LanguageSelectionScreen } from './LanguageSelectionScreen';
 export { PrivacyPolicyScreen } from './PrivacyPolicyScreen';
 export { HelpCenterScreen } from './HelpCenterScreen';
+export { WordCounterScreen } from './WordCounterScreen';
+export { CaseConverterScreen } from './CaseConverterScreen';
