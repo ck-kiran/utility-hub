@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,7 +52,11 @@ export function BottomTabNavigator() {
           borderTopWidth: 1,
           paddingTop: 8,
           paddingBottom: Math.max(insets.bottom, 8),
-          height: 40 + Math.max(insets.bottom, 0),
+          height: Platform.select({
+            ios: 50 + insets.bottom,
+            android: 60 + insets.bottom,
+            default: 60 + insets.bottom,
+          }),
         },
         tabBarLabelStyle: {
           fontSize: 12,
