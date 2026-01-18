@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, Button } from '@/components/common';
+import { Text } from '@/components/common';
 import { ToolCard, RecentFileItem, SectionHeader } from '@/components/home';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, borderRadius } from '@/theme';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
 import { getPopularTools } from '@/config/tools';
@@ -33,8 +33,8 @@ export function HomeScreen() {
   useAppStore((state) => state.language);
   const popularTools = getPopularTools();
 
-  const handleUpload = () => {
-    // TODO: Implement file upload
+  const handleSearch = () => {
+    navigation.navigate('MainTabs', { screen: 'Tools' });
   };
 
   const handleToolPress = (toolId: string, toolName: string) => {
@@ -66,15 +66,18 @@ export function HomeScreen() {
           <Text variant="body" color={colors.text.secondary} style={styles.heroSubtitle}>
             {t('common.hero_subtitle')}
           </Text>
-          <Button
-            variant="primary"
-            size="lg"
-            fullWidth
-            leftIcon={<Ionicons name="cloud-upload-outline" size={20} color={colors.surface} />}
-            onPress={handleUpload}
-          >
-            {t('common.upload_file')}
-          </Button>
+
+          <Pressable style={styles.searchBar} onPress={handleSearch}>
+            <View style={styles.searchContent}>
+              <Ionicons name="search-outline" size={24} color={colors.primary[500]} />
+              <Text color={colors.text.tertiary} style={styles.searchPlaceholder}>
+                Search for tools...
+              </Text>
+            </View>
+            <View style={styles.searchButton}>
+              <Ionicons name="arrow-forward" size={20} color={colors.surface} />
+            </View>
+          </Pressable>
         </View>
 
         {/* Popular Tools */}
@@ -147,12 +150,42 @@ const styles = StyleSheet.create({
     paddingVertical: spacing[6],
   },
   heroTitle: {
-    textAlign: 'center',
     marginBottom: spacing[2],
+    maxWidth: '80%',
   },
   heroSubtitle: {
-    textAlign: 'center',
-    marginBottom: spacing[5],
+    marginBottom: spacing[6],
+    maxWidth: '90%',
+    lineHeight: 24,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    padding: spacing[2],
+    paddingLeft: spacing[4],
+    borderRadius: borderRadius.full,
+    shadowColor: colors.primary[900],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  searchContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchPlaceholder: {
+    marginLeft: spacing[3],
+  },
+  searchButton: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primary[500],
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   section: {
     marginBottom: spacing[6],
