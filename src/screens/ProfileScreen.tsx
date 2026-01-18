@@ -4,11 +4,22 @@ import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '@/components/common';
 import { ProfileHeader, ProfileSection, ProfileMenuItem } from '@/components/profile';
 import { colors, spacing } from '@/theme';
+import { t } from '@/i18n';
+import { useAppStore } from '@/store';
 import type { ProfileScreenProps } from '@/navigation';
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  es: 'Español',
+  hi: 'हिन्दी',
+  ml: 'മലയാളം',
+  ta: 'தமிழ்',
+};
 
 export function ProfileScreen() {
   const navigation = useNavigation<ProfileScreenProps['navigation']>();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const { language } = useAppStore();
 
   const handleSignOut = () => {
     // TODO: Implement sign out
@@ -30,10 +41,10 @@ export function ProfileScreen() {
     <ScreenContainer padding={false}>
       <ProfileHeader name="Alex Johnson" email="alex.johnson@example.com" />
 
-      <ProfileSection title="Preferences">
+      <ProfileSection title={t('common.preferences')}>
         <ProfileMenuItem
           icon="notifications-outline"
-          label="Notifications"
+          label={t('common.notifications')}
           rightElement={
             <Switch
               value={notificationsEnabled}
@@ -45,29 +56,29 @@ export function ProfileScreen() {
         />
         <ProfileMenuItem
           icon="language-outline"
-          label="Language"
-          value="English"
+          label={t('common.language')}
+          value={LANGUAGE_NAMES[language] || 'English'}
           onPress={handleLanguage}
           testID="item-language"
         />
         <ProfileMenuItem
           icon="moon-outline"
-          label="Dark Mode"
+          label={t('common.dark_mode')}
           value="System"
           testID="item-dark-mode"
         />
       </ProfileSection>
 
-      <ProfileSection title="Support">
+      <ProfileSection title={t('common.support')}>
         <ProfileMenuItem
           icon="help-circle-outline"
-          label="Help Center"
+          label={t('common.help_center')}
           onPress={handleHelpCenter}
           testID="item-help"
         />
         <ProfileMenuItem
           icon="shield-checkmark-outline"
-          label="Privacy Policy"
+          label={t('common.privacy_policy')}
           onPress={handlePrivacyPolicy}
           testID="item-privacy"
         />
@@ -76,7 +87,7 @@ export function ProfileScreen() {
       <ProfileSection>
         <ProfileMenuItem
           icon="log-out-outline"
-          label="Sign Out"
+          label={t('common.sign_out')}
           isDestructive
           showChevron={false}
           onPress={handleSignOut}

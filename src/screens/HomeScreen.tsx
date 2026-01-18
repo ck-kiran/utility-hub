@@ -6,13 +6,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text, Button } from '@/components/common';
 import { ToolCard, RecentFileItem, SectionHeader } from '@/components/home';
 import { colors, spacing } from '@/theme';
+import { t } from '@/i18n';
+import { useAppStore } from '@/store';
 import type { HomeScreenProps } from '@/navigation';
 
 const POPULAR_TOOLS = [
-  { id: '1', label: 'Merge PDF', icon: 'git-merge-outline' as const },
-  { id: '2', label: 'Image to PDF', icon: 'image-outline' as const },
-  { id: '3', label: 'Compress PDF', icon: 'resize-outline' as const },
-  { id: '4', label: 'Split PDF', icon: 'cut-outline' as const },
+  { id: '1', labelKey: 'tools.merge_pdf', icon: 'git-merge-outline' as const },
+  { id: '2', labelKey: 'tools.image_to_pdf', icon: 'image-outline' as const },
+  { id: '3', labelKey: 'tools.compress_pdf', icon: 'resize-outline' as const },
+  { id: '4', labelKey: 'tools.split_pdf', icon: 'cut-outline' as const },
 ];
 
 const RECENT_FILES = [
@@ -34,6 +36,7 @@ const RECENT_FILES = [
 
 export function HomeScreen() {
   const navigation = useNavigation<HomeScreenProps['navigation']>();
+  useAppStore((state) => state.language);
 
   const handleUpload = () => {
     // TODO: Implement file upload
@@ -66,10 +69,10 @@ export function HomeScreen() {
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <Text variant="h1" style={styles.heroTitle}>
-            All Your File & Text Tools
+            {t('common.hero_title')}
           </Text>
           <Text variant="body" color={colors.text.secondary} style={styles.heroSubtitle}>
-            Convert, merge, and edit files in seconds. Simple and fast.
+            {t('common.hero_subtitle')}
           </Text>
           <Button
             variant="primary"
@@ -78,24 +81,24 @@ export function HomeScreen() {
             leftIcon={<Ionicons name="cloud-upload-outline" size={20} color={colors.surface} />}
             onPress={handleUpload}
           >
-            Upload File
+            {t('common.upload_file')}
           </Button>
         </View>
 
         {/* Popular Tools */}
         <View style={styles.section}>
           <SectionHeader
-            title="Popular Tools"
-            actionLabel="See All"
+            title={t('common.popular_tools')}
+            actionLabel={t('common.see_all')}
             onActionPress={handleSeeAllTools}
           />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.toolsScroll}>
             {POPULAR_TOOLS.map((tool) => (
               <ToolCard
                 key={tool.id}
-                label={tool.label}
+                label={t(tool.labelKey)}
                 icon={<Ionicons name={tool.icon} size={28} color={colors.primary[500]} />}
-                onPress={() => handleToolPress(tool.id, tool.label)}
+                onPress={() => handleToolPress(tool.id, t(tool.labelKey))}
               />
             ))}
           </ScrollView>
@@ -103,7 +106,7 @@ export function HomeScreen() {
 
         {/* Recent Files */}
         <View style={styles.section}>
-          <SectionHeader title="Recent Files" />
+          <SectionHeader title={t('common.recent_files')} />
           {RECENT_FILES.map((file) => (
             <RecentFileItem
               key={file.id}

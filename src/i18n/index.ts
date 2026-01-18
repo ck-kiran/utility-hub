@@ -3,10 +3,16 @@ import * as Localization from 'expo-localization';
 
 import en from './locales/en.json';
 import es from './locales/es.json';
+import ml from './locales/ml.json';
+import ta from './locales/ta.json';
+import hi from './locales/hi.json';
 
 const i18n = new I18n({
   en,
   es,
+  ml,
+  ta,
+  hi,
 });
 
 i18n.locale = Localization.getLocales()[0]?.languageCode ?? 'en';

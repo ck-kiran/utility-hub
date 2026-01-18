@@ -6,6 +6,8 @@ import { Text } from '@/components/common';
 import { SearchBar } from '@/components/tools';
 import { LanguageItem } from '@/components/language';
 import { colors, spacing } from '@/theme';
+import { useAppStore } from '@/store';
+import { setLocale } from '@/i18n';
 
 interface Language {
   code: string;
@@ -15,26 +17,18 @@ interface Language {
 
 const SUGGESTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', localName: 'United States' },
-  { code: 'es', name: 'Español' },
 ];
 
 const ALL_LANGUAGES: Language[] = [
-  { code: 'de', name: 'Deutsch' },
-  { code: 'fr', name: 'Français' },
-  { code: 'it', name: 'Italiano' },
-  { code: 'pt', name: 'Português' },
-  { code: 'ru', name: 'Русский' },
-  { code: 'zh', name: '中文', localName: 'Chinese' },
-  { code: 'ja', name: '日本語', localName: 'Japanese' },
-  { code: 'ko', name: '한국어', localName: 'Korean' },
-  { code: 'ar', name: 'العربية', localName: 'Arabic' },
   { code: 'hi', name: 'हिन्दी', localName: 'Hindi' },
+  { code: 'ml', name: 'മലയാളം', localName: 'Malayalam' },
+  { code: 'ta', name: 'தமிழ்', localName: 'Tamil' },
 ];
 
 export function LanguageSelectionScreen() {
   const navigation = useNavigation();
+  const { language, setLanguage } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   const filteredSuggested = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -61,12 +55,12 @@ export function LanguageSelectionScreen() {
   }, [searchQuery]);
 
   const handleDone = () => {
-    // TODO: Save language preference
     navigation.goBack();
   };
 
   const handleSelectLanguage = (code: string) => {
-    setSelectedLanguage(code);
+    setLanguage(code);
+    setLocale(code);
   };
 
   return (
@@ -107,7 +101,7 @@ export function LanguageSelectionScreen() {
                     key={lang.code}
                     name={lang.name}
                     localName={lang.localName}
-                    isSelected={selectedLanguage === lang.code}
+                    isSelected={language === lang.code}
                     onPress={() => handleSelectLanguage(lang.code)}
                     testID={`language-${lang.code}`}
                   />
@@ -120,7 +114,7 @@ export function LanguageSelectionScreen() {
           {filteredAll.length > 0 && (
             <View style={styles.section}>
               <Text variant="labelSmall" color={colors.text.tertiary} style={styles.sectionLabel}>
-                ALL LANGUAGES
+                REGIONAL LANGUAGES
               </Text>
               <View style={styles.languageList}>
                 {filteredAll.map((lang) => (
@@ -128,7 +122,7 @@ export function LanguageSelectionScreen() {
                     key={lang.code}
                     name={lang.name}
                     localName={lang.localName}
-                    isSelected={selectedLanguage === lang.code}
+                    isSelected={language === lang.code}
                     onPress={() => handleSelectLanguage(lang.code)}
                     testID={`language-${lang.code}`}
                   />
