@@ -4,3 +4,4 @@ export { HistoryScreen } from './HistoryScreen';
 export { ProfileScreen } from './ProfileScreen';
 export { ToolDetailScreen } from './ToolDetailScreen';
 export { WordCounterScreen } from './WordCounterScreen';
+export { CaseConverterScreen } from './CaseConverterScreen';

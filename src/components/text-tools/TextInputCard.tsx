@@ -9,6 +9,7 @@ interface TextInputCardProps {
   placeholder?: string;
   label?: string;
   testID?: string;
+  editable?: boolean;
 }
 
 export function TextInputCard({
@@ -17,6 +18,7 @@ export function TextInputCard({
   placeholder = 'Start typing or paste your document here...',
   label,
   testID,
+  editable = true,
 }: TextInputCardProps) {
   return (
     <View style={styles.container} testID={testID}>
@@ -34,6 +36,7 @@ export function TextInputCard({
         multiline
         textAlignVertical="top"
         testID={testID ? `${testID}-input` : undefined}
+        editable={editable}
       />
     </View>
   );

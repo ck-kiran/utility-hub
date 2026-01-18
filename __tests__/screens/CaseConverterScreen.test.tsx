@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TextInput } from 'react-native';
-import { WordCounterScreen } from '@/screens/WordCounterScreen';
+import { CaseConverterScreen } from '@/screens/CaseConverterScreen';
 
 // Mock navigation
 const mockGoBack = jest.fn();
@@ -12,18 +12,19 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }));
 
-describe('WordCounterScreen', () => {
+describe('CaseConverterScreen', () => {
   const renderScreen = () => {
     return render(
       <SafeAreaProvider>
-        <WordCounterScreen />
+        <CaseConverterScreen />
       </SafeAreaProvider>
     );
   };
 
   it('renders correctly', () => {
-    const { UNSAFE_getByType, toJSON } = renderScreen();
-    expect(UNSAFE_getByType(TextInput)).toBeTruthy();
+    const { UNSAFE_getAllByType, toJSON } = renderScreen();
+    // Verify inputs exist (Input and Output)
+    expect(UNSAFE_getAllByType(TextInput).length).toBeGreaterThanOrEqual(2);
     expect(toJSON()).toBeTruthy();
   });
 });

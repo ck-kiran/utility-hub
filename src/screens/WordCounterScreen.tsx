@@ -1,5 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, Pressable, Clipboard, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Clipboard,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -64,42 +75,53 @@ export function WordCounterScreen() {
           <View style={styles.headerSpacer} />
         </View>
 
-        {/* Text Input */}
-        <View style={styles.content}>
-          <TextInputCard
-            value={text}
-            onChangeText={setText}
-            label="PLAIN TEXT"
-            testID="word-counter-input"
-          />
-        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+              {/* Text Input */}
+              <View style={styles.content}>
+                <View style={styles.inputWrapper}>
+                  <TextInputCard
+                    value={text}
+                    onChangeText={setText}
+                    label="PLAIN TEXT"
+                    testID="word-counter-input"
+                  />
+                </View>
+              </View>
 
-        {/* Stats */}
-        <View style={styles.statsContainer}>
-          <StatsBar stats={stats} testID="word-counter-stats" />
-        </View>
+              {/* Stats */}
+              <View style={styles.statsContainer}>
+                <StatsBar stats={stats} testID="word-counter-stats" />
+              </View>
+            </ScrollView>
+          </TouchableWithoutFeedback>
 
-        {/* Action Buttons */}
-        <View style={styles.footer}>
-          <Button
-            variant="outline"
-            size="lg"
-            leftIcon={<Ionicons name="trash-outline" size={20} color={colors.primary[500]} />}
-            onPress={handleClear}
-            style={styles.clearButton}
-          >
-            Clear
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            leftIcon={<Ionicons name="copy-outline" size={20} color={colors.surface} />}
-            onPress={handleCopyStats}
-            style={styles.copyButton}
-          >
-            Copy Stats
-          </Button>
-        </View>
+          {/* Action Buttons */}
+          <View style={styles.footer}>
+            <Button
+              variant="outline"
+              size="lg"
+              leftIcon={<Ionicons name="trash-outline" size={20} color={colors.primary[500]} />}
+              onPress={handleClear}
+              style={styles.clearButton}
+            >
+              Clear
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              leftIcon={<Ionicons name="copy-outline" size={20} color={colors.surface} />}
+              onPress={handleCopyStats}
+              style={styles.copyButton}
+            >
+              Copy Stats
+            </Button>
+          </View>
+        </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );
@@ -112,6 +134,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   header: {
     flexDirection: 'row',
@@ -132,9 +160,11 @@ const styles = StyleSheet.create({
     width: 40,
   },
   content: {
-    flex: 1,
     paddingHorizontal: spacing[4],
     paddingBottom: spacing[4],
+  },
+  inputWrapper: {
+    height: 300,
   },
   statsContainer: {
     paddingHorizontal: spacing[4],
@@ -145,6 +175,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[4],
     backgroundColor: colors.background,
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral[100],
     gap: spacing[3],
   },
   clearButton: {
