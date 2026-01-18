@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, Button } from '@/components/common';
 import { ToolCard, RecentFileItem, SectionHeader } from '@/components/home';
 import { colors, spacing } from '@/theme';
+import type { HomeScreenProps } from '@/navigation';
 
 const POPULAR_TOOLS = [
   { id: '1', label: 'Merge PDF', icon: 'git-merge-outline' as const },
@@ -31,16 +33,18 @@ const RECENT_FILES = [
 ];
 
 export function HomeScreen() {
+  const navigation = useNavigation<HomeScreenProps['navigation']>();
+
   const handleUpload = () => {
     // TODO: Implement file upload
   };
 
-  const handleToolPress = (_toolId: string) => {
-    // TODO: Navigate to tool detail
+  const handleToolPress = (toolId: string, toolName: string) => {
+    navigation.navigate('ToolDetail', { toolId, toolName });
   };
 
   const handleSeeAllTools = () => {
-    // TODO: Navigate to tools screen
+    navigation.navigate('MainTabs', { screen: 'Tools' });
   };
 
   return (
@@ -91,7 +95,7 @@ export function HomeScreen() {
                 key={tool.id}
                 label={tool.label}
                 icon={<Ionicons name={tool.icon} size={28} color={colors.primary[500]} />}
-                onPress={() => handleToolPress(tool.id)}
+                onPress={() => handleToolPress(tool.id, tool.label)}
               />
             ))}
           </ScrollView>

@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/common';
 import { SearchBar, ToolListItem, ToolCategory } from '@/components/tools';
 import { colors, spacing } from '@/theme';
+import type { ToolsScreenProps } from '@/navigation';
 
 interface Tool {
   id: string;
@@ -95,6 +97,7 @@ const TOOL_CATEGORIES: ToolCategoryData[] = [
 ];
 
 export function ToolsScreen() {
+  const navigation = useNavigation<ToolsScreenProps['navigation']>();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredCategories = useMemo(() => {
@@ -112,8 +115,8 @@ export function ToolsScreen() {
     })).filter((category) => category.tools.length > 0);
   }, [searchQuery]);
 
-  const handleToolPress = (_toolId: string) => {
-    // TODO: Navigate to tool detail
+  const handleToolPress = (toolId: string, toolName: string) => {
+    navigation.navigate('ToolDetail', { toolId, toolName });
   };
 
   const handleHistoryPress = () => {
@@ -143,7 +146,7 @@ export function ToolsScreen() {
                   icon={<Ionicons name={tool.icon} size={22} color={colors.primary[500]} />}
                   title={tool.title}
                   description={tool.description}
-                  onPress={() => handleToolPress(tool.id)}
+                  onPress={() => handleToolPress(tool.id, tool.title)}
                 />
                 {index < category.tools.length - 1 && <View style={styles.divider} />}
               </React.Fragment>

@@ -2,14 +2,14 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { BottomTabNavigator } from '@/navigation';
+import { RootNavigator } from '@/navigation';
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <StatusBar style="auto" />
-        <BottomTabNavigator />
+        <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>
   );
