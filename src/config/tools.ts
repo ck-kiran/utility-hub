@@ -8,6 +8,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.merge_pdf',
     descriptionKey: 'tools.merge_pdf_desc',
     icon: 'git-merge-outline',
+    route: 'MergePdf',
     isPopular: true,
     themeColor: colors.error[500],
   },
