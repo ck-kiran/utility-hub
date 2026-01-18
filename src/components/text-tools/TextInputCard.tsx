@@ -10,6 +10,7 @@ interface TextInputCardProps {
   label?: string;
   testID?: string;
   editable?: boolean;
+  inputAccessoryViewID?: string;
 }
 
 export function TextInputCard({
@@ -19,6 +20,7 @@ export function TextInputCard({
   label,
   testID,
   editable = true,
+  inputAccessoryViewID,
 }: TextInputCardProps) {
   return (
     <View style={styles.container} testID={testID}>
@@ -37,6 +39,7 @@ export function TextInputCard({
         textAlignVertical="top"
         testID={testID ? `${testID}-input` : undefined}
         editable={editable}
+        inputAccessoryViewID={inputAccessoryViewID}
       />
     </View>
   );

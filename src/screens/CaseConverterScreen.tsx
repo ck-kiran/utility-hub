@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, Button } from '@/components/common';
+import { Text, Button, KeyboardDoneAccessory } from '@/components/common';
 import { TextInputCard } from '@/components/text-tools';
 import { colors, spacing, borderRadius } from '@/theme';
 import { CaseType, transformText } from '@/utils/textTransforms';
@@ -38,6 +38,7 @@ export function CaseConverterScreen() {
   const navigation = useNavigation();
   const [text, setText] = useState('');
   const [selectedCase, setSelectedCase] = useState<CaseType>('uppercase');
+  const inputAccessoryViewID = 'case-converter-done';
 
   const transformedText = useMemo(() => {
     return transformText(text, selectedCase);
@@ -100,6 +101,7 @@ export function CaseConverterScreen() {
                   onChangeText={setText}
                   placeholder="Type or paste text here..."
                   testID="case-converter-input"
+                  inputAccessoryViewID={inputAccessoryViewID}
                 />
                 <View style={styles.statsOverlay}>
                   <Text variant="caption" color={colors.primary[500]}>
@@ -182,6 +184,7 @@ export function CaseConverterScreen() {
             </Button>
           </View>
         </KeyboardAvoidingView>
+        <KeyboardDoneAccessory inputAccessoryViewID={inputAccessoryViewID} />
       </View>
     </SafeAreaView>
   );

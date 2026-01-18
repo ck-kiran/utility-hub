@@ -14,13 +14,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, Button } from '@/components/common';
+import { Text, Button, KeyboardDoneAccessory } from '@/components/common';
 import { TextInputCard, StatsBar } from '@/components/text-tools';
 import { colors, spacing } from '@/theme';
 
 export function WordCounterScreen() {
   const navigation = useNavigation();
   const [text, setText] = useState('');
+  const inputAccessoryViewID = 'word-counter-done';
 
   const stats = useMemo(() => {
     const trimmedText = text.trim();
@@ -87,8 +88,9 @@ export function WordCounterScreen() {
                   <TextInputCard
                     value={text}
                     onChangeText={setText}
-                    label="PLAIN TEXT"
+                    // label="PLAIN TEXT"
                     testID="word-counter-input"
+                    inputAccessoryViewID={inputAccessoryViewID}
                   />
                 </View>
               </View>
@@ -122,6 +124,7 @@ export function WordCounterScreen() {
             </Button>
           </View>
         </KeyboardAvoidingView>
+        <KeyboardDoneAccessory inputAccessoryViewID={inputAccessoryViewID} />
       </View>
     </SafeAreaView>
   );

@@ -21,3 +21,5 @@ export type { DividerProps } from './Divider';
 
 export { ScreenContainer } from './ScreenContainer';
 export type { ScreenContainerProps } from './ScreenContainer';
+
+export { KeyboardDoneAccessory } from './KeyboardDoneAccessory';
