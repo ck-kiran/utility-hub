@@ -8,6 +8,7 @@ export type RootStackParamList = {
   ToolDetail: { toolId: string; toolName: string };
   WordCounter: undefined;
   CaseConverter: undefined;
+  JsonFormatter: undefined;
   PrivacyPolicy: undefined;
   HelpCenter: undefined;
   LanguageSelection: undefined;
@@ -53,3 +54,4 @@ export type HelpCenterScreenProps = RootStackScreenProps<'HelpCenter'>;
 export type LanguageSelectionScreenProps = RootStackScreenProps<'LanguageSelection'>;
 export type WordCounterScreenProps = RootStackScreenProps<'WordCounter'>;
 export type CaseConverterScreenProps = RootStackScreenProps<'CaseConverter'>;
+export type JsonFormatterScreenProps = RootStackScreenProps<'JsonFormatter'>;

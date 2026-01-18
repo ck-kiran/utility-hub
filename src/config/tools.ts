@@ -100,6 +100,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     descriptionKey: 'tools.json_formatter_desc',
     icon: 'code-slash-outline',
     themeColor: colors.warning[600],
+    route: 'JsonFormatter',
   },
   'color-picker': {
     id: 'color-picker',
