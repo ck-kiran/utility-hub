@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Text } from '@/components/common';
 import { SearchBar } from '@/components/tools';
 import { LanguageItem } from '@/components/language';
-import { colors, spacing, borderRadius } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 interface Language {
   code: string;
