@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
   },
   doneButton: {
     padding: spacing[2],
-    width: 50,
     alignItems: 'flex-end',
   },
   doneText: {
