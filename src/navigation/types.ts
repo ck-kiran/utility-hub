@@ -6,6 +6,9 @@ import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigat
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<BottomTabParamList>;
   ToolDetail: { toolId: string; toolName: string };
+  HelpCenter: undefined;
+  PrivacyPolicy: undefined;
+  LanguageSelection: undefined;
 };
 
 // Bottom Tabs
@@ -43,3 +46,6 @@ export type ProfileScreenProps = CompositeScreenProps<
 >;
 
 export type ToolDetailScreenProps = RootStackScreenProps<'ToolDetail'>;
+export type HelpCenterScreenProps = RootStackScreenProps<'HelpCenter'>;
+export type PrivacyPolicyScreenProps = RootStackScreenProps<'PrivacyPolicy'>;
+export type LanguageSelectionScreenProps = RootStackScreenProps<'LanguageSelection'>;
