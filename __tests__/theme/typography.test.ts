@@ -17,7 +17,7 @@ describe('Typography', () => {
   it('has heading variants', () => {
     expect(typography.variants.h1).toBeDefined();
     expect(typography.variants.h1.fontSize).toBe(30);
-    expect(typography.variants.h1.fontWeight).toBe('700');
+    expect(typography.variants.h1.fontFamily).toBe('PlusJakartaSans_700Bold');
 
     expect(typography.variants.h2).toBeDefined();
     expect(typography.variants.h3).toBeDefined();
@@ -39,7 +39,7 @@ describe('Typography', () => {
 
   it('has button variants', () => {
     expect(typography.variants.button).toBeDefined();
-    expect(typography.variants.button.fontWeight).toBe('600');
+    expect(typography.variants.button.fontFamily).toBe('PlusJakartaSans_600SemiBold');
 
     expect(typography.variants.buttonSmall).toBeDefined();
   });

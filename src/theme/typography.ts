@@ -2,21 +2,15 @@
  * Typography system for UtilityHub
  */
 
-import { Platform, TextStyle } from 'react-native';
-
-const fontFamily = Platform.select({
-  ios: 'System',
-  android: 'Roboto',
-  default: 'System',
-});
+import { TextStyle } from 'react-native';
 
 export const typography = {
   // Font families
   fontFamily: {
-    regular: fontFamily,
-    medium: fontFamily,
-    semiBold: fontFamily,
-    bold: fontFamily,
+    regular: 'PlusJakartaSans_400Regular',
+    medium: 'PlusJakartaSans_500Medium',
+    semiBold: 'PlusJakartaSans_600SemiBold',
+    bold: 'PlusJakartaSans_700Bold',
   },
 
   // Font sizes
@@ -50,71 +44,71 @@ export const typography = {
   variants: {
     // Headings
     h1: {
+      fontFamily: 'PlusJakartaSans_700Bold',
       fontSize: 30,
-      fontWeight: '700' as TextStyle['fontWeight'],
       lineHeight: 38,
     },
     h2: {
+      fontFamily: 'PlusJakartaSans_700Bold',
       fontSize: 24,
-      fontWeight: '700' as TextStyle['fontWeight'],
       lineHeight: 32,
     },
     h3: {
+      fontFamily: 'PlusJakartaSans_600SemiBold',
       fontSize: 20,
-      fontWeight: '600' as TextStyle['fontWeight'],
       lineHeight: 28,
     },
     h4: {
+      fontFamily: 'PlusJakartaSans_600SemiBold',
       fontSize: 18,
-      fontWeight: '600' as TextStyle['fontWeight'],
       lineHeight: 26,
     },
 
     // Body
     bodyLarge: {
+      fontFamily: 'PlusJakartaSans_400Regular',
       fontSize: 18,
-      fontWeight: '400' as TextStyle['fontWeight'],
       lineHeight: 28,
     },
     body: {
+      fontFamily: 'PlusJakartaSans_400Regular',
       fontSize: 16,
-      fontWeight: '400' as TextStyle['fontWeight'],
       lineHeight: 24,
     },
     bodySmall: {
+      fontFamily: 'PlusJakartaSans_400Regular',
       fontSize: 14,
-      fontWeight: '400' as TextStyle['fontWeight'],
       lineHeight: 20,
     },
 
     // Labels
     label: {
+      fontFamily: 'PlusJakartaSans_500Medium',
       fontSize: 14,
-      fontWeight: '500' as TextStyle['fontWeight'],
       lineHeight: 20,
     },
     labelSmall: {
+      fontFamily: 'PlusJakartaSans_500Medium',
       fontSize: 12,
-      fontWeight: '500' as TextStyle['fontWeight'],
       lineHeight: 16,
     },
 
     // Caption
     caption: {
+      fontFamily: 'PlusJakartaSans_400Regular',
       fontSize: 12,
-      fontWeight: '400' as TextStyle['fontWeight'],
       lineHeight: 16,
     },
 
     // Button
     button: {
+      fontFamily: 'PlusJakartaSans_600SemiBold',
       fontSize: 16,
-      fontWeight: '600' as TextStyle['fontWeight'],
       lineHeight: 24,
     },
     buttonSmall: {
+      fontFamily: 'PlusJakartaSans_600SemiBold',
       fontSize: 14,
-      fontWeight: '600' as TextStyle['fontWeight'],
       lineHeight: 20,
     },
   },
