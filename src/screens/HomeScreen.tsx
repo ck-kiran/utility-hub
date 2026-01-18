@@ -12,9 +12,9 @@ import type { HomeScreenProps } from '@/navigation';
 
 const POPULAR_TOOLS = [
   { id: '1', labelKey: 'tools.merge_pdf', icon: 'git-merge-outline' as const },
-  { id: '2', labelKey: 'tools.image_to_pdf', icon: 'image-outline' as const },
-  { id: '3', labelKey: 'tools.compress_pdf', icon: 'resize-outline' as const },
-  { id: '4', labelKey: 'tools.split_pdf', icon: 'cut-outline' as const },
+  { id: '2', labelKey: 'tools.resize_image', icon: 'expand-outline' as const },
+  { id: '3', labelKey: 'tools.audio_to_text', icon: 'mic-outline' as const },
+  { id: '4', labelKey: 'tools.word_counter', icon: 'list-outline' as const },
 ];
 
 const RECENT_FILES = [
