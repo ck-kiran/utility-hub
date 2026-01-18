@@ -4,23 +4,23 @@ import { Text } from 'react-native';
 import { ToolCard } from '@/components/home/ToolCard';
 
 describe('ToolCard', () => {
-  const MockIcon = () => <Text>Icon</Text>;
-
   it('renders correctly', () => {
-    const { root } = render(<ToolCard icon={<MockIcon />} label="Merge PDF" />);
+    const { root } = render(<ToolCard icon="git-merge-outline" label="Merge PDF" />);
     expect(root).toBeTruthy();
   });
 
   it('calls onPress when pressed', () => {
     const onPress = jest.fn();
-    const { root } = render(<ToolCard icon={<MockIcon />} label="Merge PDF" onPress={onPress} />);
+    const { root } = render(
+      <ToolCard icon="git-merge-outline" label="Merge PDF" onPress={onPress} />
+    );
 
     fireEvent.press(root);
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it('displays the label', () => {
-    const { root } = render(<ToolCard icon={<MockIcon />} label="Image to PDF" />);
+    const { root } = render(<ToolCard icon="git-merge-outline" label="Image to PDF" />);
     expect(root).toBeTruthy();
   });
 });

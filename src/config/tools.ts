@@ -1,4 +1,5 @@
 import { Tool, ToolCategory, ToolId } from '@/types/tools';
+import { colors } from '@/theme';
 
 export const TOOLS: Record<ToolId, Tool> = {
   // PDF Tools
@@ -8,35 +9,35 @@ export const TOOLS: Record<ToolId, Tool> = {
     descriptionKey: 'tools.merge_pdf_desc',
     icon: 'git-merge-outline',
     isPopular: true,
-    themeColor: '#EF4444',
+    themeColor: colors.error[500],
   },
   'image-to-pdf': {
     id: 'image-to-pdf',
     titleKey: 'tools.image_to_pdf',
     descriptionKey: 'tools.image_to_pdf_desc',
     icon: 'image-outline',
-    themeColor: '#EF4444',
+    themeColor: colors.error[500],
   },
   'pdf-to-image': {
     id: 'pdf-to-image',
     titleKey: 'tools.pdf_to_image',
     descriptionKey: 'tools.pdf_to_image_desc',
     icon: 'images-outline',
-    themeColor: '#EF4444',
+    themeColor: colors.error[500],
   },
   'split-pdf': {
     id: 'split-pdf',
     titleKey: 'tools.split_pdf',
     descriptionKey: 'tools.split_pdf_desc',
     icon: 'cut-outline',
-    themeColor: '#EF4444',
+    themeColor: colors.error[500],
   },
   'word-to-pdf': {
     id: 'word-to-pdf',
     titleKey: 'tools.word_to_pdf',
     descriptionKey: 'tools.word_to_pdf_desc',
     icon: 'document-text-outline',
-    themeColor: '#EF4444',
+    themeColor: colors.error[500],
   },
 
   // Image Tools
@@ -46,14 +47,14 @@ export const TOOLS: Record<ToolId, Tool> = {
     descriptionKey: 'tools.resize_image_desc',
     icon: 'expand-outline',
     isPopular: true,
-    themeColor: '#3B82F6',
+    themeColor: colors.info[500],
   },
   'convert-jpg': {
     id: 'convert-jpg',
     titleKey: 'tools.convert_jpg',
     descriptionKey: 'tools.convert_jpg_desc',
     icon: 'image-outline',
-    themeColor: '#3B82F6',
+    themeColor: colors.info[500],
   },
 
   // Text Tools
@@ -64,7 +65,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     icon: 'list-outline',
     route: 'WordCounter',
     isPopular: true,
-    themeColor: '#10B981',
+    themeColor: colors.success[500],
   },
   'case-converter': {
     id: 'case-converter',
@@ -72,7 +73,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     descriptionKey: 'tools.case_converter_desc',
     icon: 'text-outline',
     route: 'CaseConverter',
-    themeColor: '#10B981',
+    themeColor: colors.success[500],
   },
 
   // Audio Tools
@@ -82,14 +83,14 @@ export const TOOLS: Record<ToolId, Tool> = {
     descriptionKey: 'tools.audio_to_text_desc',
     icon: 'mic-outline',
     isPopular: true,
-    themeColor: '#8B5CF6',
+    themeColor: colors.primary[500],
   },
   'text-to-audio': {
     id: 'text-to-audio',
     titleKey: 'tools.text_to_audio',
     descriptionKey: 'tools.text_to_audio_desc',
     icon: 'volume-high-outline',
-    themeColor: '#8B5CF6',
+    themeColor: colors.primary[500],
   },
 
   // Developer Tools
@@ -98,14 +99,14 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.json_formatter',
     descriptionKey: 'tools.json_formatter_desc',
     icon: 'code-slash-outline',
-    themeColor: '#F97316',
+    themeColor: colors.warning[600],
   },
   'color-picker': {
     id: 'color-picker',
     titleKey: 'tools.color_picker',
     descriptionKey: 'tools.color_picker_desc',
     icon: 'color-palette-outline',
-    themeColor: '#F97316',
+    themeColor: colors.warning[600],
   },
 };
 

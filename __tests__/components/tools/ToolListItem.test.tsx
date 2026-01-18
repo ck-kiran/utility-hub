@@ -4,11 +4,13 @@ import { Text } from 'react-native';
 import { ToolListItem } from '@/components/tools/ToolListItem';
 
 describe('ToolListItem', () => {
-  const MockIcon = () => <Text>Icon</Text>;
-
   it('renders correctly', () => {
     const { root } = render(
-      <ToolListItem icon={<MockIcon />} title="Merge PDF" description="Combine multiple files" />
+      <ToolListItem
+        icon="git-merge-outline"
+        title="Merge PDF"
+        description="Combine multiple files"
+      />
     );
     expect(root).toBeTruthy();
   });
@@ -17,7 +19,7 @@ describe('ToolListItem', () => {
     const onPress = jest.fn();
     const { root } = render(
       <ToolListItem
-        icon={<MockIcon />}
+        icon="git-merge-outline"
         title="Merge PDF"
         description="Combine multiple files"
         onPress={onPress}
@@ -30,7 +32,7 @@ describe('ToolListItem', () => {
 
   it('displays title and description', () => {
     const { root } = render(
-      <ToolListItem icon={<MockIcon />} title="Compress PDF" description="Reduce file size" />
+      <ToolListItem icon="git-merge-outline" title="Compress PDF" description="Reduce file size" />
     );
     expect(root).toBeTruthy();
   });
