@@ -8,131 +8,9 @@ import { SearchBar, ToolListItem, ToolCategory } from '@/components/tools';
 import { colors, spacing } from '@/theme';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
+import { TOOL_CATEGORIES, getCategoryTools, getTool } from '@/config/tools';
+import { ToolId } from '@/types/tools';
 import type { ToolsScreenProps } from '@/navigation';
-
-interface Tool {
-  id: string;
-  titleKey: string;
-  descriptionKey: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}
-
-interface ToolCategoryData {
-  id: string;
-  titleKey: string;
-  tools: Tool[];
-}
-
-const TOOL_CATEGORIES: ToolCategoryData[] = [
-  {
-    id: 'pdf',
-    titleKey: 'tools.pdf_tools',
-    tools: [
-      {
-        id: 'merge-pdf',
-        titleKey: 'tools.merge_pdf',
-        descriptionKey: 'tools.merge_pdf_desc',
-        icon: 'git-merge-outline',
-      },
-      {
-        id: 'image-to-pdf',
-        titleKey: 'tools.image_to_pdf',
-        descriptionKey: 'tools.image_to_pdf_desc',
-        icon: 'image-outline',
-      },
-      {
-        id: 'pdf-to-image',
-        titleKey: 'tools.pdf_to_image',
-        descriptionKey: 'tools.pdf_to_image_desc',
-        icon: 'images-outline',
-      },
-      {
-        id: 'split-pdf',
-        titleKey: 'tools.split_pdf',
-        descriptionKey: 'tools.split_pdf_desc',
-        icon: 'cut-outline',
-      },
-      {
-        id: 'word-to-pdf',
-        titleKey: 'tools.word_to_pdf',
-        descriptionKey: 'tools.word_to_pdf_desc',
-        icon: 'document-text-outline',
-      },
-    ],
-  },
-  {
-    id: 'image',
-    titleKey: 'tools.image_tools',
-    tools: [
-      {
-        id: 'resize-image',
-        titleKey: 'tools.resize_image',
-        descriptionKey: 'tools.resize_image_desc',
-        icon: 'expand-outline',
-      },
-      {
-        id: 'convert-jpg',
-        titleKey: 'tools.convert_jpg',
-        descriptionKey: 'tools.convert_jpg_desc',
-        icon: 'image-outline',
-      },
-    ],
-  },
-  {
-    id: 'text',
-    titleKey: 'tools.text_tools',
-    tools: [
-      {
-        id: 'word-counter',
-        titleKey: 'tools.word_counter',
-        descriptionKey: 'tools.word_counter_desc',
-        icon: 'list-outline',
-      },
-      {
-        id: 'case-converter',
-        titleKey: 'tools.case_converter',
-        descriptionKey: 'tools.case_converter_desc',
-        icon: 'text-outline',
-      },
-    ],
-  },
-  {
-    id: 'audio',
-    titleKey: 'tools.audio_tools',
-    tools: [
-      {
-        id: 'audio-to-text',
-        titleKey: 'tools.audio_to_text',
-        descriptionKey: 'tools.audio_to_text_desc',
-        icon: 'mic-outline',
-      },
-      {
-        id: 'text-to-audio',
-        titleKey: 'tools.text_to_audio',
-        descriptionKey: 'tools.text_to_audio_desc',
-        icon: 'volume-high-outline',
-      },
-    ],
-  },
-  {
-    id: 'developer',
-    titleKey: 'tools.dev_tools',
-    tools: [
-      {
-        id: 'json-formatter',
-        titleKey: 'tools.json_formatter',
-        descriptionKey: 'tools.json_formatter_desc',
-        icon: 'code-slash-outline',
-      },
-      {
-        id: 'color-picker',
-        titleKey: 'tools.color_picker',
-        descriptionKey: 'tools.color_picker_desc',
-        icon: 'color-palette-outline',
-      },
-    ],
-  },
-];
 
 export function ToolsScreen() {
   const navigation = useNavigation<ToolsScreenProps['navigation']>();
@@ -141,28 +19,31 @@ export function ToolsScreen() {
 
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) {
-      return TOOL_CATEGORIES;
+      return TOOL_CATEGORIES.map((category) => ({
+        ...category,
+        tools: getCategoryTools(category.id),
+      }));
     }
 
     const query = searchQuery.toLowerCase();
-    return TOOL_CATEGORIES.map((category) => ({
-      ...category,
-      tools: category.tools.filter((tool) => {
-        const title = t(tool.titleKey).toLowerCase();
-        const description = t(tool.descriptionKey).toLowerCase();
-        return title.includes(query) || description.includes(query);
-      }),
-    })).filter((category) => category.tools.length > 0);
+    return TOOL_CATEGORIES.map((category) => {
+      const categoryTools = getCategoryTools(category.id);
+      return {
+        ...category,
+        tools: categoryTools.filter((tool) => {
+          const title = t(tool.titleKey).toLowerCase();
+          const description = t(tool.descriptionKey).toLowerCase();
+          return title.includes(query) || description.includes(query);
+        }),
+      };
+    }).filter((category) => category.tools.length > 0);
   }, [searchQuery]);
 
   const handleToolPress = (toolId: string, toolName: string) => {
-    // Navigate to specific tool screens for text tools
-    if (toolId === 'word-counter') {
-      navigation.navigate('WordCounter');
-      return;
-    }
-    if (toolId === 'case-converter') {
-      navigation.navigate('CaseConverter');
+    const tool = getTool(toolId as ToolId);
+    if (tool?.route) {
+      // @ts-expect-error - Dynamic navigation
+      navigation.navigate(tool.route);
       return;
     }
     // Default to generic tool detail screen
