@@ -32,6 +32,10 @@
     "history": "इतिहास",
     "profile": "प्रोफ़ाइल"
   },
+  "history": {
+    "today": "आज",
+    "yesterday": "कल"
+  },
   "tools": {
     "pdf_tools": "PDF टूल्स",
     "image_tools": "इमेज टूल्स",

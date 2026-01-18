@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button } from '@/components/common';
 import { ActivityItem, DateSection } from '@/components/history';
 import { colors, spacing } from '@/theme';
+import { t } from '@/i18n';
+import { useAppStore } from '@/store';
 
 const TODAY_ACTIVITIES = [
   {
@@ -52,6 +54,8 @@ const YESTERDAY_ACTIVITIES = [
 ];
 
 export function HistoryScreen() {
+  useAppStore((state) => state.language);
+
   const handleClearHistory = () => {
     // TODO: Implement clear history
   };
@@ -70,18 +74,18 @@ export function HistoryScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text variant="h1">Recent Activity</Text>
+            <Text variant="h1">{t('common.recent_activity')}</Text>
             <Text variant="body" color={colors.text.tertiary}>
-              Your processing history
+              {t('common.history_subtitle')}
             </Text>
           </View>
           <Button variant="outline" size="sm" onPress={handleClearHistory}>
-            CLEAR
+            {t('common.clear')}
           </Button>
         </View>
 
         {/* Today Section */}
-        <DateSection title="TODAY">
+        <DateSection title={t('history.today')}>
           {TODAY_ACTIVITIES.map((activity) => (
             <ActivityItem
               key={activity.id}
@@ -97,7 +101,7 @@ export function HistoryScreen() {
         </DateSection>
 
         {/* Yesterday Section */}
-        <DateSection title="YESTERDAY">
+        <DateSection title={t('history.yesterday')}>
           {YESTERDAY_ACTIVITIES.map((activity) => (
             <ActivityItem
               key={activity.id}
