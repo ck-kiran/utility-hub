@@ -16,9 +16,7 @@ export function ToolListItem({ icon, title, description, onPress }: ToolListItem
     <Pressable onPress={onPress} style={styles.container}>
       <View style={styles.iconContainer}>{icon}</View>
       <View style={styles.content}>
-        <Text variant="body" weight="medium">
-          {title}
-        </Text>
+        <Text variant="body">{title}</Text>
         <Text variant="caption" color={colors.text.tertiary}>
           {description}
         </Text>
