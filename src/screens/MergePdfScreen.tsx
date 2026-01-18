@@ -9,6 +9,7 @@ import { FileListCard, ProgressIndicator } from '@/components/pdf-tools';
 import { useFilePicker } from '@/hooks';
 import { colors, spacing } from '@/theme';
 import { ProcessingState } from '@/types/pdf';
+import { t } from '@/i18n';
 
 export function MergePdfScreen() {
   const navigation = useNavigation();
@@ -33,11 +34,11 @@ export function MergePdfScreen() {
 
   const handleMerge = useCallback(async () => {
     if (files.length < 2) {
-      Alert.alert('Not enough files', 'Please select at least 2 PDF files to merge.');
+      Alert.alert(t('common.error'), t('pdf.at_least_two_files'));
       return;
     }
 
-    setProcessingState({ status: 'processing', progress: 0, message: 'Preparing files...' });
+    setProcessingState({ status: 'processing', progress: 0, message: t('pdf.processing') });
 
     try {
       // Simulate PDF merge progress
@@ -55,14 +56,14 @@ export function MergePdfScreen() {
       setProcessingState({
         status: 'complete',
         progress: 1,
-        message: 'Merge complete! Ready to save.',
+        message: t('pdf.merge_complete'),
         outputUri: files[0].uri, // Placeholder - would be the merged file
       });
     } catch (err) {
       setProcessingState({
         status: 'error',
         progress: 0,
-        message: err instanceof Error ? err.message : 'Failed to merge PDFs',
+        message: err instanceof Error ? err.message : t('common.error'),
       });
     }
   }, [files]);
@@ -74,13 +75,13 @@ export function MergePdfScreen() {
         if (isAvailable) {
           await Sharing.shareAsync(processingState.outputUri, {
             mimeType: 'application/pdf',
-            dialogTitle: 'Save Merged PDF',
+            dialogTitle: t('pdf.save_share'),
           });
         } else {
           Alert.alert('Sharing not available', 'Sharing is not available on this device.');
         }
       } catch {
-        Alert.alert('Error', 'Failed to share the file.');
+        Alert.alert(t('common.error'), 'Failed to share the file.');
       }
     }
   }, [processingState.outputUri]);
@@ -98,7 +99,7 @@ export function MergePdfScreen() {
           </Pressable>
           <View style={styles.headerTitleContainer}>
             <Text variant="h3" style={styles.headerTitle}>
-              Merge PDF
+              {t('tools.merge_pdf')}
             </Text>
           </View>
           <Pressable
@@ -119,7 +120,7 @@ export function MergePdfScreen() {
           {/* Instructions */}
           <View style={styles.section}>
             <Text variant="body" color={colors.text.secondary}>
-              Select multiple PDF files to combine them into a single document. Drag to reorder.
+              {t('pdf.drag_to_reorder')}
             </Text>
           </View>
 
@@ -127,7 +128,7 @@ export function MergePdfScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text variant="labelSmall" color={colors.text.tertiary}>
-                SELECTED FILES ({files.length})
+                {t('pdf.select_files').toUpperCase()} ({files.length})
               </Text>
             </View>
             <FileListCard
@@ -136,8 +137,8 @@ export function MergePdfScreen() {
               onReorder={reorderFiles}
               onAdd={pickFiles}
               maxFiles={20}
-              emptyStateText="No PDF files selected"
-              addButtonText="Add PDF Files"
+              emptyStateText={t('pdf.no_files_selected')}
+              addButtonText={t('pdf.add_pdf_files')}
               testID="file-list"
             />
           </View>
@@ -161,7 +162,7 @@ export function MergePdfScreen() {
               onPress={handleSave}
               testID="save-button"
             >
-              Save & Share
+              {t('pdf.save_share')}
             </Button>
           ) : (
             <Button
@@ -174,7 +175,7 @@ export function MergePdfScreen() {
               loading={processingState.status === 'processing'}
               testID="merge-button"
             >
-              Merge PDFs
+              {t('pdf.merge_pdfs')}
             </Button>
           )}
         </View>

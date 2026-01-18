@@ -28,19 +28,19 @@ const createShadow = (
 export const shadows = {
   none: createShadow(0, 0, 0, 0),
   sm: createShadow(1, 2, 0.05, 1),
-  md: createShadow(2, 4, 0.08, 3),
-  lg: createShadow(4, 8, 0.1, 6),
-  xl: createShadow(8, 16, 0.12, 10),
-  '2xl': createShadow(12, 24, 0.15, 15),
+  md: createShadow(2, 4, 0.08, 2),
+  lg: createShadow(4, 8, 0.1, 4),
+  xl: createShadow(8, 16, 0.12, 8),
+  '2xl': createShadow(12, 24, 0.15, 12),
 
   // Card shadow (common use case)
-  card: createShadow(2, 8, 0.06, 3),
+  card: createShadow(2, 8, 0.06, 2),
 
   // Button shadow
   button: createShadow(2, 4, 0.1, 2),
 
   // Modal shadow
-  modal: createShadow(8, 24, 0.15, 12),
+  modal: createShadow(8, 24, 0.15, 8),
 } as const;
 
 export type ShadowKeys = keyof typeof shadows;

@@ -33,6 +33,8 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.split_pdf',
     descriptionKey: 'tools.split_pdf_desc',
     icon: 'cut-outline',
+    route: 'SplitPdf',
+    isPopular: true,
     themeColor: colors.error[500],
   },
   'word-to-pdf': {

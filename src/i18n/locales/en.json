@@ -89,7 +89,22 @@
     "select_pdf": "Select PDF",
     "output_format": "Output Format",
     "convert_to_images": "Convert to Images",
-    "select_pdf_to_extract": "Select a PDF file to extract pages as individual images."
+    "select_pdf_to_extract": "Select a PDF file to extract pages as individual images.",
+    "split_pdf": "Split PDF",
+    "split_options": "SPLIT OPTIONS",
+    "all_pages": "All Pages",
+    "all_pages_desc": "Extract each page as separate PDF",
+    "custom_range": "Custom Range",
+    "custom_range_desc": "Specify pages to extract",
+    "page_numbers": "PAGE NUMBERS",
+    "invalid_range": "Invalid Range",
+    "enter_valid_pages": "Please enter valid page numbers (1-{{max}}) or ranges (e.g., 1-3, 5, 7-9).",
+    "no_pdf_alert": "Please select a PDF file to split.",
+    "extract_pages_prompt": "Please enter page numbers to extract.",
+    "created_files": "Created {{count}} PDF {{unit}}",
+    "save_split_pdfs": "Save Split PDFs",
+    "split_instructions": "Select a PDF file and choose which pages to extract.",
+    "hint_ranges": "Enter page numbers or ranges separated by commas"
   },
   "welcome": {
     "title": "Welcome to Utility Hub",

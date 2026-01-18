@@ -9,6 +9,7 @@ import {
   MergePdfScreen,
   ImageToPdfScreen,
   PdfToImageScreen,
+  SplitPdfScreen,
   PrivacyPolicyScreen,
   HelpCenterScreen,
   LanguageSelectionScreen,
@@ -28,6 +29,7 @@ export function RootNavigator() {
       <Stack.Screen name="MergePdf" component={MergePdfScreen} />
       <Stack.Screen name="ImageToPdf" component={ImageToPdfScreen} />
       <Stack.Screen name="PdfToImage" component={PdfToImageScreen} />
+      <Stack.Screen name="SplitPdf" component={SplitPdfScreen} />
       <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />

@@ -12,3 +12,4 @@ export { JsonFormatterScreen } from './JsonFormatterScreen';
 export { MergePdfScreen } from './MergePdfScreen';
 export { ImageToPdfScreen } from './ImageToPdfScreen';
 export { PdfToImageScreen } from './PdfToImageScreen';
+export { SplitPdfScreen } from './SplitPdfScreen';

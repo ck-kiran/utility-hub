@@ -38,7 +38,13 @@ export function HomeScreen() {
   };
 
   const handleToolPress = (toolId: string, toolName: string) => {
-    navigation.navigate('ToolDetail', { toolId, toolName });
+    const tool = getPopularTools().find((t) => t.id === toolId);
+    if (tool?.route) {
+      // @ts-expect-error - Dynamic route navigation
+      navigation.navigate(tool.route);
+    } else {
+      navigation.navigate('ToolDetail', { toolId, toolName });
+    }
   };
 
   const handleSeeAllTools = () => {
