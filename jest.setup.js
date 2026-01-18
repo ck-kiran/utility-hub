@@ -16,8 +16,23 @@ jest.mock('expo-asset', () => ({
 
 // Mock expo-font
 jest.mock('expo-font', () => ({
-  loadAsync: jest.fn(),
+  loadAsync: jest.fn(() => Promise.resolve()),
   isLoaded: jest.fn(() => true),
+}));
+
+// Mock expo-splash-screen
+jest.mock('expo-splash-screen', () => ({
+  preventAutoHideAsync: jest.fn(() => Promise.resolve()),
+  hideAsync: jest.fn(() => Promise.resolve()),
+}));
+
+// Mock @expo-google-fonts/plus-jakarta-sans
+jest.mock('@expo-google-fonts/plus-jakarta-sans', () => ({
+  useFonts: () => [true], // Return fontsLoaded: true
+  PlusJakartaSans_400Regular: 'PlusJakartaSans_400Regular',
+  PlusJakartaSans_500Medium: 'PlusJakartaSans_500Medium',
+  PlusJakartaSans_600SemiBold: 'PlusJakartaSans_600SemiBold',
+  PlusJakartaSans_700Bold: 'PlusJakartaSans_700Bold',
 }));
 
 // Mock @expo/vector-icons
