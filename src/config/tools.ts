@@ -25,6 +25,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.pdf_to_image',
     descriptionKey: 'tools.pdf_to_image_desc',
     icon: 'images-outline',
+    route: 'PdfToImage',
     themeColor: colors.error[500],
   },
   'split-pdf': {
