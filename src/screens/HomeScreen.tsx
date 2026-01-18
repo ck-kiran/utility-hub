@@ -89,7 +89,8 @@ export function HomeScreen() {
               <ToolCard
                 key={tool.id}
                 label={t(tool.titleKey)}
-                icon={<Ionicons name={tool.icon} size={28} color={colors.primary[500]} />}
+                icon={tool.icon}
+                themeColor={tool.themeColor}
                 onPress={() => handleToolPress(tool.id, t(tool.titleKey))}
               />
             ))}

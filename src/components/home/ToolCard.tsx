@@ -1,18 +1,30 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/common';
 import { colors, spacing, borderRadius } from '@/theme';
+import { hexToRgba } from '@/utils/colors';
 
 interface ToolCardProps {
-  icon: React.ReactNode;
+  icon: keyof typeof Ionicons.glyphMap;
   label: string;
+  themeColor?: string;
   onPress?: () => void;
 }
 
-export function ToolCard({ icon, label, onPress }: ToolCardProps) {
+export function ToolCard({
+  icon,
+  label,
+  themeColor = colors.primary[500],
+  onPress,
+}: ToolCardProps) {
+  const backgroundColor = hexToRgba(themeColor, 0.1);
+
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <View style={styles.iconContainer}>{icon}</View>
+      <View style={[styles.iconContainer, { backgroundColor }]}>
+        <Ionicons name={icon} size={32} color={themeColor} />
+      </View>
       <Text variant="caption" style={styles.label} numberOfLines={2}>
         {label}
       </Text>
@@ -30,7 +42,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing[2],
