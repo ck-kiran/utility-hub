@@ -84,7 +84,12 @@
     "convert_to_pdf": "Convert to PDF",
     "at_least_one_image": "Please select at least one image to convert.",
     "select_images": "Select images to convert into a single PDF document. Images will be added in order.",
-    "pdf_quality": "PDF Quality"
+    "pdf_quality": "PDF Quality",
+    "no_pdf_selected": "No PDF selected",
+    "select_pdf": "Select PDF",
+    "output_format": "Output Format",
+    "convert_to_images": "Convert to Images",
+    "select_pdf_to_extract": "Select a PDF file to extract pages as individual images."
   },
   "welcome": {
     "title": "Welcome to Utility Hub",
