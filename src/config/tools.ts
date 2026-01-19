@@ -51,6 +51,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.resize_image',
     descriptionKey: 'tools.resize_image_desc',
     icon: 'expand-outline',
+    route: 'ResizeImage',
     isPopular: true,
     themeColor: colors.info[500],
   },
@@ -59,6 +60,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.convert_jpg',
     descriptionKey: 'tools.convert_jpg_desc',
     icon: 'image-outline',
+    route: 'ConvertToJpg',
     themeColor: colors.info[500],
   },
 
