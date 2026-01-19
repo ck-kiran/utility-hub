@@ -166,6 +166,19 @@ export function AudioToTextScreen() {
         setSelectedFileName(file.name);
         setAudioSource('file');
         setRecordingStatus('recorded');
+
+        // Load the audio file to get its duration
+        try {
+          const { sound: tempSound } = await Audio.Sound.createAsync({ uri: file.uri });
+          const status = await tempSound.getStatusAsync();
+          if (status.isLoaded && status.durationMillis) {
+            setRecordingDuration(status.durationMillis / 1000);
+          }
+          await tempSound.unloadAsync();
+        } catch (err) {
+          console.error('Failed to get audio duration:', err);
+          // Don't show error to user, just continue without duration
+        }
       }
     } catch (error) {
       console.error('Failed to pick audio file:', error);

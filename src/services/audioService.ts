@@ -122,3 +122,100 @@ export function estimateTranscriptionCost(durationSeconds: number): number {
   const costPerMinute = 0.006;
   return Math.ceil(minutes * costPerMinute * 100) / 100; // Round up to 2 decimals
 }
+
+export interface TextToSpeechOptions {
+  text: string;
+  voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+  model?: 'tts-1' | 'tts-1-hd';
+  speed?: number; // 0.25 to 4.0
+  onProgress?: (progress: number, message: string) => void;
+}
+
+export interface TextToSpeechResult {
+  audioUri: string;
+  duration?: number;
+  size: number;
+}
+
+/**
+ * Convert text to speech using OpenAI TTS API
+ */
+export async function textToSpeech(options: TextToSpeechOptions): Promise<TextToSpeechResult> {
+  const { text, voice = 'alloy', model = 'tts-1', speed = 1.0, onProgress } = options;
+
+  try {
+    onProgress?.(0, 'Preparing text...');
+
+    // Get API key from environment
+    const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
+
+    if (!apiKey) {
+      throw new Error(
+        'OpenAI API key not configured. Please set EXPO_PUBLIC_OPENAI_API_KEY in your .env file'
+      );
+    }
+
+    onProgress?.(0.2, 'Generating speech...');
+
+    // Call TTS API
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        input: text,
+        voice,
+        speed,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error?.message || `TTS API error: ${response.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+    onProgress?.(0.6, 'Saving audio file...');
+
+    // Get audio data
+    const audioBlob = await response.blob();
+    const audioData = await audioBlob.arrayBuffer();
+
+    // Save to file
+    const { File, Paths } = await import('expo-file-system/next');
+    const fileName = `tts-${Date.now()}.mp3`;
+    const outputFile = new File(Paths.cache, fileName);
+    outputFile.create({ overwrite: true });
+    outputFile.write(new Uint8Array(audioData));
+
+    onProgress?.(1, 'Audio ready!');
+
+    return {
+      audioUri: outputFile.uri,
+      size: audioData.byteLength,
+    };
+  } catch (error) {
+    console.error('Error generating speech:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to generate speech');
+  }
+}
+
+/**
+ * Get available TTS voices
+ */
+export function getTTSVoices() {
+  return [
+    { code: 'alloy', name: 'Alloy', description: 'Neutral and balanced' },
+    { code: 'echo', name: 'Echo', description: 'Male voice' },
+    { code: 'fable', name: 'Fable', description: 'British accent' },
+    { code: 'onyx', name: 'Onyx', description: 'Deep male voice' },
+    { code: 'nova', name: 'Nova', description: 'Female voice' },
+    { code: 'shimmer', name: 'Shimmer', description: 'Soft female voice' },
+  ];
+}
