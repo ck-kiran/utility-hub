@@ -236,7 +236,7 @@ export function AudioToTextScreen() {
       }
 
       // Start speech recognition
-      await ExpoSpeechRecognitionModule.start({
+      ExpoSpeechRecognitionModule.start({
         lang: 'en-US',
         interimResults: true,
         maxAlternatives: 1,
@@ -245,17 +245,17 @@ export function AudioToTextScreen() {
       });
 
       // Play the audio while recognizing
-      await playRecording();
+      playRecording();
     } catch (error) {
       console.error('Failed to start transcription:', error);
       Alert.alert(t('common.error'), 'Failed to start automatic transcription');
     }
   }, [recordingUri, playRecording]);
 
-  const handleStopTranscription = useCallback(async () => {
+  const handleStopTranscription = useCallback(() => {
     try {
-      await ExpoSpeechRecognitionModule.stop();
-      await stopPlayback();
+      ExpoSpeechRecognitionModule.stop();
+      stopPlayback();
     } catch (error) {
       console.error('Failed to stop transcription:', error);
     }
