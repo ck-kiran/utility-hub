@@ -3,158 +3,139 @@ import { View, StyleSheet, Pressable, ScrollView, Alert, TextInput } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import {
+  useAudioRecorder,
+  useAudioPlayer,
+  useAudioRecorderState,
+  RecordingPresets,
+} from 'expo-audio';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Text, Button } from '@/components/common';
 import { colors, spacing } from '@/theme';
 import { t } from '@/i18n';
 
-type RecordingStatus = 'idle' | 'recording' | 'recorded' | 'playing';
-type AudioSource = 'recording' | 'file';
+type ViewMode = 'idle' | 'recording' | 'recorded' | 'playing' | 'recognizing';
 
 export function AudioToTextScreen() {
   const navigation = useNavigation();
-  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>('idle');
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('idle');
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [transcriptionText, setTranscriptionText] = useState('');
-  const [audioSource, setAudioSource] = useState<AudioSource | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('');
+  const [recognitionAvailable, setRecognitionAvailable] = useState(false);
+  const [isRecognizing, setIsRecognizing] = useState(false);
 
+  // Audio recorder with high quality preset
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(recorder);
+
+  // Audio player for playback
+  const [playerSource, setPlayerSource] = useState<string | null>(null);
+  const player = useAudioPlayer(playerSource);
+
+  // Check if speech recognition is available
+  useEffect(() => {
+    ExpoSpeechRecognitionModule.getStateAsync()
+      .then(() => {
+        setRecognitionAvailable(true);
+      })
+      .catch(() => {
+        setRecognitionAvailable(false);
+      });
+  }, []);
+
+  // Handle speech recognition events
+  useSpeechRecognitionEvent('result', (event) => {
+    const transcript = event.results[0]?.transcript;
+    if (transcript) {
+      setTranscriptionText((prev) => prev + (prev ? ' ' : '') + transcript);
+    }
+  });
+
+  useSpeechRecognitionEvent('end', () => {
+    setIsRecognizing(false);
+    setViewMode('recorded');
+  });
+
+  useSpeechRecognitionEvent('error', (event) => {
+    setIsRecognizing(false);
+    setViewMode('recorded');
+    Alert.alert('Recognition Error', event.error || 'Failed to recognize speech');
+  });
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Cleanup
-      if (recording) {
-        recording.stopAndUnloadAsync().catch(console.error);
-      }
-      if (sound) {
-        sound.unloadAsync().catch(console.error);
+      if (isRecognizing) {
+        ExpoSpeechRecognitionModule.stop();
       }
     };
-  }, [recording, sound]);
+  }, [isRecognizing]);
 
   const handleBack = () => {
     navigation.goBack();
   };
 
-  const handleClear = () => {
-    if (sound) {
-      sound.unloadAsync().catch(console.error);
-      setSound(null);
+  const handleClear = async () => {
+    try {
+      if (isRecognizing) {
+        ExpoSpeechRecognitionModule.stop();
+        setIsRecognizing(false);
+      }
+      setViewMode('idle');
+      setRecordingUri(null);
+      setTranscriptionText('');
+      setSelectedFileName('');
+      setPlayerSource(null);
+    } catch {
+      // Ignore cleanup errors
     }
-    setRecordingStatus('idle');
-    setRecording(null);
-    setRecordingUri(null);
-    setRecordingDuration(0);
-    setTranscriptionText('');
-    setAudioSource(null);
-    setSelectedFileName('');
   };
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(() => {
     try {
-      // Request permissions
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant microphone permission to record audio');
-        return;
-      }
-
-      // Configure audio mode
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      // Create recording
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-
-      setRecording(newRecording);
-      setRecordingStatus('recording');
-
-      // Monitor duration
-      newRecording.setOnRecordingStatusUpdate((status) => {
-        if (status.isRecording) {
-          setRecordingDuration(status.durationMillis / 1000);
-        }
-      });
-    } catch (error) {
-      console.error('Failed to start recording:', error);
+      recorder.record();
+      setViewMode('recording');
+    } catch {
       Alert.alert(t('common.error'), 'Failed to start recording');
     }
-  }, []);
+  }, [recorder]);
 
   const stopRecording = useCallback(async () => {
-    if (!recording) return;
-
     try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-
-      setRecordingUri(uri);
-      setRecordingStatus('recorded');
-      setRecording(null);
-
-      // Reset audio mode
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-      });
-    } catch (error) {
-      console.error('Failed to stop recording:', error);
+      await recorder.stop();
+      const uri = recorder.uri;
+      if (uri) {
+        setRecordingUri(uri);
+        setViewMode('recorded');
+      }
+    } catch {
       Alert.alert(t('common.error'), 'Failed to stop recording');
     }
-  }, [recording]);
+  }, [recorder]);
 
-  const playRecording = useCallback(async () => {
-    if (!recordingUri) return;
+  const playRecording = useCallback(() => {
+    if (recordingUri) {
+      setPlayerSource(recordingUri);
+      setViewMode('playing');
+      player.play();
 
-    try {
-      // Configure audio mode for playback (especially important for iOS)
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: true,
-      });
-
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: recordingUri },
-        { shouldPlay: false }
-      );
-
-      setSound(newSound);
-      setRecordingStatus('playing');
-
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setRecordingStatus('recorded');
+      // Monitor playback completion
+      const checkPlayback = setInterval(() => {
+        if (!player.playing) {
+          setViewMode('recorded');
+          clearInterval(checkPlayback);
         }
-      });
-
-      await newSound.playAsync();
-    } catch (error) {
-      console.error('Failed to play recording:', error);
-      Alert.alert(t('common.error'), 'Failed to play recording');
+      }, 100);
     }
-  }, [recordingUri]);
+  }, [recordingUri, player]);
 
-  const stopPlayback = useCallback(async () => {
-    if (!sound) return;
-
-    try {
-      await sound.stopAsync();
-      await sound.unloadAsync();
-      setSound(null);
-      setRecordingStatus('recorded');
-    } catch (error) {
-      console.error('Failed to stop playback:', error);
-    }
-  }, [sound]);
+  const stopPlayback = useCallback(() => {
+    player.pause();
+    setViewMode('recorded');
+  }, [player]);
 
   const handlePickAudioFile = useCallback(async () => {
     try {
@@ -167,25 +148,58 @@ export function AudioToTextScreen() {
         const file = result.assets[0];
         setRecordingUri(file.uri);
         setSelectedFileName(file.name);
-        setAudioSource('file');
-        setRecordingStatus('recorded');
-
-        // Load the audio file to get its duration
-        try {
-          const { sound: tempSound } = await Audio.Sound.createAsync({ uri: file.uri });
-          const status = await tempSound.getStatusAsync();
-          if (status.isLoaded && status.durationMillis) {
-            setRecordingDuration(status.durationMillis / 1000);
-          }
-          await tempSound.unloadAsync();
-        } catch (err) {
-          console.error('Failed to get audio duration:', err);
-          // Don't show error to user, just continue without duration
-        }
+        setViewMode('recorded');
       }
-    } catch (error) {
-      console.error('Failed to pick audio file:', error);
+    } catch {
       Alert.alert(t('common.error'), 'Failed to pick audio file');
+    }
+  }, []);
+
+  const handleAutoTranscribe = useCallback(async () => {
+    if (!recognitionAvailable) {
+      Alert.alert(
+        'Feature Unavailable',
+        'Speech recognition requires a development build.\n\nThis feature is not available in Expo Go. Please build the app with "npx expo run:ios" or "npx expo run:android" to use automatic transcription.\n\nAlternatively, you can type the transcription manually.'
+      );
+      return;
+    }
+
+    try {
+      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!granted) {
+        Alert.alert(
+          'Permission Required',
+          'Please grant microphone permission for speech recognition'
+        );
+        return;
+      }
+
+      setIsRecognizing(true);
+      setViewMode('recognizing');
+
+      await ExpoSpeechRecognitionModule.start({
+        lang: 'en-US',
+        interimResults: true,
+        maxAlternatives: 1,
+        continuous: true,
+        requiresOnDeviceRecognition: false,
+        addsPunctuation: true,
+        contextualStrings: [],
+      });
+    } catch {
+      setIsRecognizing(false);
+      setViewMode('recorded');
+      Alert.alert(t('common.error'), 'Failed to start speech recognition');
+    }
+  }, [recognitionAvailable]);
+
+  const handleStopTranscribe = useCallback(async () => {
+    try {
+      ExpoSpeechRecognitionModule.stop();
+      setIsRecognizing(false);
+      setViewMode('recorded');
+    } catch {
+      // Ignore stop errors
     }
   }, []);
 
@@ -213,15 +227,15 @@ export function AudioToTextScreen() {
         dialogTitle: 'Save Transcription',
         UTI: 'public.plain-text',
       });
-    } catch (error) {
-      console.error('Failed to download transcription:', error);
+    } catch {
       Alert.alert(t('common.error'), 'Failed to download transcription');
     }
   }, [transcriptionText]);
 
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
+  const formatDuration = (milliseconds: number): string => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -242,12 +256,12 @@ export function AudioToTextScreen() {
             onPress={handleClear}
             style={styles.clearButton}
             testID="clear-button"
-            disabled={recordingStatus === 'idle'}
+            disabled={viewMode === 'idle'}
           >
             <Ionicons
               name="trash-outline"
               size={24}
-              color={recordingStatus !== 'idle' ? colors.text.secondary : colors.neutral[300]}
+              color={viewMode !== 'idle' ? colors.text.secondary : colors.neutral[300]}
             />
           </Pressable>
         </View>
@@ -256,18 +270,20 @@ export function AudioToTextScreen() {
           {/* Instructions */}
           <View style={styles.section}>
             <Text variant="body" color={colors.text.secondary}>
-              {recordingStatus === 'idle'
+              {viewMode === 'idle'
                 ? 'Record audio or upload an audio file to transcribe'
-                : recordingStatus === 'recording'
+                : viewMode === 'recording'
                   ? 'Recording in progress... Tap stop when finished'
-                  : audioSource === 'file'
-                    ? `Selected: ${selectedFileName}`
-                    : 'Tap transcribe to convert your recording to text'}
+                  : viewMode === 'recognizing'
+                    ? 'Listening and transcribing... Speak clearly'
+                    : selectedFileName
+                      ? `Selected: ${selectedFileName}`
+                      : 'Use auto transcribe or type manually'}
             </Text>
           </View>
 
           {/* Upload Audio File Button */}
-          {recordingStatus === 'idle' && (
+          {viewMode === 'idle' && (
             <View style={styles.section}>
               <Button
                 variant="outline"
@@ -287,29 +303,40 @@ export function AudioToTextScreen() {
           {/* Recording Visualizer */}
           <View style={styles.section}>
             <View style={styles.visualizerContainer}>
-              {recordingStatus === 'recording' ? (
+              {viewMode === 'recording' ? (
                 <View style={styles.recordingIndicator}>
                   <View style={styles.recordingPulse} />
                   <Ionicons name="mic" size={48} color={colors.error[500]} />
                   <Text variant="h2" style={styles.durationText}>
-                    {formatDuration(recordingDuration)}
+                    {formatDuration(recorderState.durationMillis || 0)}
                   </Text>
                   <Text variant="caption" color={colors.error[500]}>
                     Recording...
                   </Text>
                 </View>
-              ) : recordingStatus === 'recorded' || recordingStatus === 'playing' ? (
+              ) : viewMode === 'recognizing' ? (
+                <View style={styles.recordingIndicator}>
+                  <View style={styles.recordingPulse} />
+                  <Ionicons name="ear" size={48} color={colors.primary[500]} />
+                  <Text variant="body" style={styles.durationText}>
+                    Transcribing...
+                  </Text>
+                  <Text variant="caption" color={colors.primary[500]}>
+                    Speak clearly into the microphone
+                  </Text>
+                </View>
+              ) : viewMode === 'recorded' || viewMode === 'playing' ? (
                 <View style={styles.recordedIndicator}>
                   <Ionicons
-                    name={recordingStatus === 'playing' ? 'volume-high' : 'checkmark-circle'}
+                    name={viewMode === 'playing' ? 'volume-high' : 'checkmark-circle'}
                     size={48}
                     color={colors.success[500]}
                   />
                   <Text variant="h2" style={styles.durationText}>
-                    {formatDuration(recordingDuration)}
+                    {formatDuration(recorderState.durationMillis || 0)}
                   </Text>
                   <Text variant="caption" color={colors.success[500]}>
-                    {recordingStatus === 'playing' ? 'Playing...' : 'Recording Complete'}
+                    {viewMode === 'playing' ? 'Playing...' : 'Recording Complete'}
                   </Text>
                 </View>
               ) : (
@@ -324,7 +351,7 @@ export function AudioToTextScreen() {
           </View>
 
           {/* Playback Controls */}
-          {(recordingStatus === 'recorded' || recordingStatus === 'playing') && (
+          {(viewMode === 'recorded' || viewMode === 'playing') && recordingUri && (
             <View style={styles.section}>
               <View style={styles.playbackControls}>
                 <Button
@@ -332,22 +359,60 @@ export function AudioToTextScreen() {
                   size="md"
                   leftIcon={
                     <Ionicons
-                      name={recordingStatus === 'playing' ? 'stop' : 'play'}
+                      name={viewMode === 'playing' ? 'stop' : 'play'}
                       size={20}
                       color={colors.primary[500]}
                     />
                   }
-                  onPress={recordingStatus === 'playing' ? stopPlayback : playRecording}
+                  onPress={viewMode === 'playing' ? stopPlayback : playRecording}
                   testID="play-button"
                 >
-                  {recordingStatus === 'playing' ? 'Stop' : 'Play Recording'}
+                  {viewMode === 'playing' ? 'Stop' : 'Play Recording'}
                 </Button>
               </View>
             </View>
           )}
 
+          {/* Auto Transcribe Button */}
+          {viewMode === 'recorded' && !isRecognizing && (
+            <View style={styles.section}>
+              <Button
+                variant="primary"
+                size="md"
+                fullWidth
+                leftIcon={<Ionicons name="mic-circle" size={20} color={colors.surface} />}
+                onPress={handleAutoTranscribe}
+                testID="auto-transcribe-button"
+              >
+                Auto Transcribe (Speak Live)
+              </Button>
+              {!recognitionAvailable && (
+                <Text variant="caption" color={colors.warning[600]} style={styles.warningText}>
+                  ⚠️ Requires development build (run: npx expo run:ios/android)
+                </Text>
+              )}
+            </View>
+          )}
+
+          {/* Stop Transcribing Button */}
+          {isRecognizing && (
+            <View style={styles.section}>
+              <Button
+                variant="primary"
+                size="md"
+                fullWidth
+                leftIcon={<Ionicons name="stop-circle" size={20} color={colors.surface} />}
+                onPress={handleStopTranscribe}
+                testID="stop-transcribe-button"
+                style={{ backgroundColor: colors.error[500] }}
+              >
+                Stop Transcribing
+              </Button>
+            </View>
+          )}
+
           {/* Transcription Input */}
-          {(recordingStatus === 'recorded' || recordingStatus === 'playing') && (
+          {(viewMode === 'recorded' || viewMode === 'playing' || viewMode === 'recognizing') && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text variant="labelSmall" color={colors.text.tertiary}>
@@ -361,23 +426,24 @@ export function AudioToTextScreen() {
                 style={styles.transcriptionInput}
                 value={transcriptionText}
                 onChangeText={setTranscriptionText}
-                placeholder="Type or paste your transcription here...&#10;&#10;Tip: Use your keyboard's voice input while playing the audio for easier transcription."
+                placeholder="Transcription will appear here...&#10;&#10;Use Auto Transcribe to speak live, or type manually."
                 placeholderTextColor={colors.text.tertiary}
                 multiline
                 textAlignVertical="top"
                 testID="transcription-input"
+                editable={!isRecognizing}
               />
             </View>
           )}
 
           {/* Info Card */}
-          {recordingStatus !== 'idle' && !transcriptionText && (
+          {viewMode === 'recorded' && !transcriptionText && !isRecognizing && (
             <View style={styles.section}>
               <View style={styles.infoCard}>
                 <Ionicons name="information-circle" size={24} color={colors.info[500]} />
                 <Text variant="caption" color={colors.text.secondary} style={styles.infoText}>
-                  Manual Transcription: Play the audio and type the text using your keyboard. You
-                  can enable voice input on your keyboard for easier transcription.
+                  Two transcription options:{'\n'}• Auto Transcribe: Speak live and text appears
+                  automatically (requires dev build){'\n'}• Manual: Type while playing the audio
                 </Text>
               </View>
             </View>
@@ -386,7 +452,7 @@ export function AudioToTextScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          {recordingStatus === 'idle' && (
+          {viewMode === 'idle' && (
             <Button
               variant="primary"
               size="lg"
@@ -399,7 +465,7 @@ export function AudioToTextScreen() {
             </Button>
           )}
 
-          {recordingStatus === 'recording' && (
+          {viewMode === 'recording' && (
             <Button
               variant="primary"
               size="lg"
@@ -413,7 +479,7 @@ export function AudioToTextScreen() {
             </Button>
           )}
 
-          {(recordingStatus === 'recorded' || recordingStatus === 'playing') &&
+          {(viewMode === 'recorded' || viewMode === 'playing' || viewMode === 'recognizing') &&
             transcriptionText.trim() && (
               <Button
                 variant="primary"
@@ -422,6 +488,7 @@ export function AudioToTextScreen() {
                 leftIcon={<Ionicons name="download-outline" size={20} color={colors.surface} />}
                 onPress={handleDownloadTranscription}
                 testID="download-transcription-button"
+                disabled={isRecognizing}
               >
                 Download Transcription
               </Button>
@@ -470,6 +537,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing[4],
   },
   sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: spacing[2],
   },
   visualizerContainer: {
@@ -534,6 +604,10 @@ const styles = StyleSheet.create({
   infoText: {
     marginLeft: spacing[2],
     flex: 1,
+  },
+  warningText: {
+    marginTop: spacing[2],
+    textAlign: 'center',
   },
   footer: {
     paddingHorizontal: spacing[4],
