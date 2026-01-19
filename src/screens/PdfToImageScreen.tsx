@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -40,11 +40,26 @@ export function PdfToImageScreen() {
 
   const handleSelectPdf = useCallback(async () => {
     await pickFiles();
-    // Simulate getting page count from PDF
-    // TODO: Replace with actual PDF page count when native library is available
-    const simulatedPageCount = Math.floor(Math.random() * 10) + 1;
-    setPageCount(simulatedPageCount);
   }, [pickFiles]);
+
+  // Get page count when PDF is selected
+  useEffect(() => {
+    const getPageCount = async () => {
+      if (pdfFile) {
+        try {
+          const { getPdfPageCount } = await import('@/services/pdfService');
+          const count = await getPdfPageCount(pdfFile.uri);
+          setPageCount(count);
+        } catch (error) {
+          console.error('Error getting page count:', error);
+          Alert.alert('Error', 'Failed to read PDF file');
+          setPageCount(0);
+        }
+      }
+    };
+
+    getPageCount();
+  }, [pdfFile]);
 
   const handleConvert = useCallback(async () => {
     if (!pdfFile) {
@@ -55,27 +70,25 @@ export function PdfToImageScreen() {
     setProcessingState({ status: 'processing', progress: 0, message: 'Loading PDF...' });
 
     try {
-      // Simulate PDF to image conversion progress
-      // TODO: Replace with actual conversion logic when native library is available
-      for (let i = 0; i <= 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        setProcessingState({
-          status: 'processing',
-          progress: i / 10,
-          message:
-            i < 3
-              ? 'Reading PDF pages...'
-              : i < 7
-                ? `Extracting pages...`
-                : `Converting to ${format.toUpperCase()}...`,
-        });
-      }
+      const { convertPdfToImages } = await import('@/services/pdfService');
+
+      const outputUri = await convertPdfToImages({
+        pdfUri: pdfFile.uri,
+        format,
+        onProgress: (progress, message) => {
+          setProcessingState({
+            status: 'processing',
+            progress,
+            message,
+          });
+        },
+      });
 
       setProcessingState({
         status: 'complete',
         progress: 1,
-        message: `${pageCount} ${pageCount === 1 ? 'image' : 'images'} created (${format.toUpperCase()})`,
-        outputUri: pdfFile.uri, // Placeholder - would be folder with images
+        message: `${pageCount} ${pageCount === 1 ? 'page' : 'pages'} extracted as PDF files (ZIP)`,
+        outputUri,
       });
     } catch (err) {
       setProcessingState({

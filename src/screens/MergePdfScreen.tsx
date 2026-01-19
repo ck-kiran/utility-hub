@@ -41,23 +41,24 @@ export function MergePdfScreen() {
     setProcessingState({ status: 'processing', progress: 0, message: t('pdf.processing') });
 
     try {
-      // Simulate PDF merge progress
-      // TODO: Replace with actual PDF merge logic when native library is available
-      for (let i = 0; i <= 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        setProcessingState({
-          status: 'processing',
-          progress: i / 10,
-          message: i < 5 ? 'Reading PDFs...' : 'Merging pages...',
-        });
-      }
+      const { mergePdfs } = await import('@/services/pdfService');
 
-      // For now, show a message that native library is needed
+      const outputUri = await mergePdfs({
+        pdfUris: files.map((f) => f.uri),
+        onProgress: (progress, message) => {
+          setProcessingState({
+            status: 'processing',
+            progress,
+            message,
+          });
+        },
+      });
+
       setProcessingState({
         status: 'complete',
         progress: 1,
-        message: t('pdf.merge_complete'),
-        outputUri: files[0].uri, // Placeholder - would be the merged file
+        message: `${files.length} PDFs merged successfully!`,
+        outputUri,
       });
     } catch (err) {
       setProcessingState({

@@ -74,7 +74,7 @@ export function useFilePicker(options: UseFilePickerOptions = {}): UseFilePicker
 
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsMultipleSelection: multiple,
         quality: 1,
       });

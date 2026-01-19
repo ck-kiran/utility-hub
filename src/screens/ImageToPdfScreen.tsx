@@ -49,23 +49,25 @@ export function ImageToPdfScreen() {
     setProcessingState({ status: 'processing', progress: 0, message: t('pdf.processing') });
 
     try {
-      // Simulate image to PDF conversion progress
-      // TODO: Replace with actual conversion logic when native library is available
-      for (let i = 0; i <= 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        setProcessingState({
-          status: 'processing',
-          progress: i / 10,
-          message:
-            i < 3 ? 'Processing images...' : i < 7 ? 'Optimizing quality...' : 'Creating PDF...',
-        });
-      }
+      const { convertImagesToPdf } = await import('@/services/pdfService');
+
+      const outputUri = await convertImagesToPdf({
+        images: images.map((img) => ({ uri: img.uri, name: img.name })),
+        quality,
+        onProgress: (progress, message) => {
+          setProcessingState({
+            status: 'processing',
+            progress,
+            message,
+          });
+        },
+      });
 
       setProcessingState({
         status: 'complete',
         progress: 1,
-        message: `Conversion complete! Quality: ${quality}`,
-        outputUri: images[0].uri, // Placeholder - would be the generated PDF
+        message: `Conversion complete! ${images.length} ${images.length === 1 ? 'image' : 'images'} converted (${quality} quality)`,
+        outputUri,
       });
     } catch (err) {
       setProcessingState({
