@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Image, StyleSheet, Dimensions, PanResponder } from 'react-native';
 import { colors, spacing } from '@/theme';
 
 interface ImageCropperProps {
   imageUri: string;
   onCropChange: (cropArea: CropArea) => void;
+  aspectRatio?: number | null; // e.g., 16/9, 1, 4/3, null = free
 }
 
 export interface CropArea {
@@ -17,8 +18,9 @@ export interface CropArea {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CONTAINER_PADDING = spacing[4];
 const MAX_WIDTH = SCREEN_WIDTH - CONTAINER_PADDING * 2;
+const MIN_SIZE = 50;
 
-export function ImageCropper({ imageUri, onCropChange }: ImageCropperProps) {
+export function ImageCropper({ imageUri, onCropChange, aspectRatio }: ImageCropperProps) {
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [cropArea, setCropArea] = useState<CropArea>({
     x: 20,
@@ -27,49 +29,115 @@ export function ImageCropper({ imageUri, onCropChange }: ImageCropperProps) {
     height: MAX_WIDTH - 40,
   });
 
+  // Store initial crop area when gesture starts
+  const initialCrop = useRef<CropArea>(cropArea);
+
   const handleImageLoad = (event: {
     nativeEvent: { source: { width: number; height: number } };
   }) => {
     const { width, height } = event.nativeEvent.source;
-    const aspectRatio = width / height;
+    const imageAspectRatio = width / height;
 
     let displayWidth = MAX_WIDTH;
-    let displayHeight = MAX_WIDTH / aspectRatio;
+    let displayHeight = MAX_WIDTH / imageAspectRatio;
 
     if (displayHeight > MAX_WIDTH) {
       displayHeight = MAX_WIDTH;
-      displayWidth = MAX_WIDTH * aspectRatio;
+      displayWidth = MAX_WIDTH * imageAspectRatio;
     }
 
     setImageDimensions({ width: displayWidth, height: displayHeight });
 
     // Set initial crop area to 80% of image
-    const initialCrop = {
-      x: displayWidth * 0.1,
-      y: displayHeight * 0.1,
-      width: displayWidth * 0.8,
-      height: displayHeight * 0.8,
+    let cropWidth = displayWidth * 0.8;
+    let cropHeight = displayHeight * 0.8;
+
+    // Apply aspect ratio if provided
+    if (aspectRatio) {
+      const availableWidth = displayWidth * 0.8;
+      const availableHeight = displayHeight * 0.8;
+
+      if (availableWidth / availableHeight > aspectRatio) {
+        // Height is the limiting factor
+        cropHeight = availableHeight;
+        cropWidth = cropHeight * aspectRatio;
+      } else {
+        // Width is the limiting factor
+        cropWidth = availableWidth;
+        cropHeight = cropWidth / aspectRatio;
+      }
+    }
+
+    const initialCropArea = {
+      x: (displayWidth - cropWidth) / 2,
+      y: (displayHeight - cropHeight) / 2,
+      width: cropWidth,
+      height: cropHeight,
     };
-    setCropArea(initialCrop);
-    onCropChange(initialCrop);
+
+    setCropArea(initialCropArea);
+    onCropChange(initialCropArea);
   };
+
+  // Update crop area when aspect ratio changes
+  useEffect(() => {
+    if (imageDimensions.width === 0) return;
+
+    let newWidth = cropArea.width;
+    let newHeight = cropArea.height;
+
+    if (aspectRatio) {
+      // Adjust to match aspect ratio, keeping width constant
+      newHeight = newWidth / aspectRatio;
+
+      // If height exceeds bounds, adjust width instead
+      if (newHeight > imageDimensions.height - cropArea.y) {
+        newHeight = imageDimensions.height - cropArea.y;
+        newWidth = newHeight * aspectRatio;
+      }
+
+      // If width exceeds bounds, scale down proportionally
+      if (newWidth > imageDimensions.width - cropArea.x) {
+        newWidth = imageDimensions.width - cropArea.x;
+        newHeight = newWidth / aspectRatio;
+      }
+    }
+
+    // Center if possible
+    const newX = Math.max(0, Math.min(cropArea.x, imageDimensions.width - newWidth));
+    const newY = Math.max(0, Math.min(cropArea.y, imageDimensions.height - newHeight));
+
+    const newCrop = { x: newX, y: newY, width: newWidth, height: newHeight };
+    setCropArea(newCrop);
+    onCropChange(newCrop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aspectRatio]);
 
   // Pan responder for dragging the entire crop area
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: () => {
+      initialCrop.current = { ...cropArea };
+    },
     onPanResponderMove: (_, gestureState) => {
       const newX = Math.max(
         0,
-        Math.min(imageDimensions.width - cropArea.width, cropArea.x + gestureState.dx)
+        Math.min(
+          imageDimensions.width - initialCrop.current.width,
+          initialCrop.current.x + gestureState.dx
+        )
       );
       const newY = Math.max(
         0,
-        Math.min(imageDimensions.height - cropArea.height, cropArea.y + gestureState.dy)
+        Math.min(
+          imageDimensions.height - initialCrop.current.height,
+          initialCrop.current.y + gestureState.dy
+        )
       );
 
       const newCrop = {
-        ...cropArea,
+        ...initialCrop.current,
         x: newX,
         y: newY,
       };
@@ -83,43 +151,113 @@ export function ImageCropper({ imageUri, onCropChange }: ImageCropperProps) {
     return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        initialCrop.current = { ...cropArea };
+      },
       onPanResponderMove: (_, gestureState) => {
-        let newCrop = { ...cropArea };
-        const minSize = 50;
+        let newCrop = { ...initialCrop.current };
 
         switch (corner) {
-          case 'tl':
-            newCrop.x = Math.max(0, cropArea.x + gestureState.dx);
-            newCrop.y = Math.max(0, cropArea.y + gestureState.dy);
-            newCrop.width = Math.max(minSize, cropArea.width - gestureState.dx);
-            newCrop.height = Math.max(minSize, cropArea.height - gestureState.dy);
+          case 'tl': {
+            // Calculate new position and size
+            const newX = Math.max(0, initialCrop.current.x + gestureState.dx);
+            const newY = Math.max(0, initialCrop.current.y + gestureState.dy);
+            const deltaX = newX - initialCrop.current.x;
+            const deltaY = newY - initialCrop.current.y;
+
+            newCrop.x = newX;
+            newCrop.y = newY;
+            newCrop.width = Math.max(MIN_SIZE, initialCrop.current.width - deltaX);
+            newCrop.height = Math.max(MIN_SIZE, initialCrop.current.height - deltaY);
+
+            // Apply aspect ratio constraint
+            if (aspectRatio) {
+              const targetHeight = newCrop.width / aspectRatio;
+              if (targetHeight > MIN_SIZE) {
+                newCrop.height = targetHeight;
+                newCrop.y = initialCrop.current.y + initialCrop.current.height - targetHeight;
+              }
+            }
             break;
-          case 'tr':
-            newCrop.y = Math.max(0, cropArea.y + gestureState.dy);
+          }
+          case 'tr': {
+            const newY = Math.max(0, initialCrop.current.y + gestureState.dy);
+            const deltaY = newY - initialCrop.current.y;
+
+            newCrop.y = newY;
             newCrop.width = Math.max(
-              minSize,
-              Math.min(imageDimensions.width - cropArea.x, cropArea.width + gestureState.dx)
+              MIN_SIZE,
+              Math.min(
+                imageDimensions.width - initialCrop.current.x,
+                initialCrop.current.width + gestureState.dx
+              )
             );
-            newCrop.height = Math.max(minSize, cropArea.height - gestureState.dy);
+            newCrop.height = Math.max(MIN_SIZE, initialCrop.current.height - deltaY);
+
+            // Apply aspect ratio constraint
+            if (aspectRatio) {
+              const targetHeight = newCrop.width / aspectRatio;
+              if (targetHeight > MIN_SIZE) {
+                newCrop.height = targetHeight;
+                newCrop.y = initialCrop.current.y + initialCrop.current.height - targetHeight;
+              }
+            }
             break;
-          case 'bl':
-            newCrop.x = Math.max(0, cropArea.x + gestureState.dx);
-            newCrop.width = Math.max(minSize, cropArea.width - gestureState.dx);
+          }
+          case 'bl': {
+            const newX = Math.max(0, initialCrop.current.x + gestureState.dx);
+            const deltaX = newX - initialCrop.current.x;
+
+            newCrop.x = newX;
+            newCrop.width = Math.max(MIN_SIZE, initialCrop.current.width - deltaX);
             newCrop.height = Math.max(
-              minSize,
-              Math.min(imageDimensions.height - cropArea.y, cropArea.height + gestureState.dy)
+              MIN_SIZE,
+              Math.min(
+                imageDimensions.height - initialCrop.current.y,
+                initialCrop.current.height + gestureState.dy
+              )
             );
+
+            // Apply aspect ratio constraint
+            if (aspectRatio) {
+              const targetHeight = newCrop.width / aspectRatio;
+              if (targetHeight > MIN_SIZE) {
+                newCrop.height = Math.min(
+                  targetHeight,
+                  imageDimensions.height - initialCrop.current.y
+                );
+              }
+            }
             break;
-          case 'br':
+          }
+          case 'br': {
             newCrop.width = Math.max(
-              minSize,
-              Math.min(imageDimensions.width - cropArea.x, cropArea.width + gestureState.dx)
+              MIN_SIZE,
+              Math.min(
+                imageDimensions.width - initialCrop.current.x,
+                initialCrop.current.width + gestureState.dx
+              )
             );
             newCrop.height = Math.max(
-              minSize,
-              Math.min(imageDimensions.height - cropArea.y, cropArea.height + gestureState.dy)
+              MIN_SIZE,
+              Math.min(
+                imageDimensions.height - initialCrop.current.y,
+                initialCrop.current.height + gestureState.dy
+              )
             );
+
+            // Apply aspect ratio constraint
+            if (aspectRatio) {
+              const targetHeight = newCrop.width / aspectRatio;
+              if (targetHeight > MIN_SIZE) {
+                newCrop.height = Math.min(
+                  targetHeight,
+                  imageDimensions.height - initialCrop.current.y
+                );
+              }
+            }
             break;
+          }
         }
 
         setCropArea(newCrop);
@@ -233,6 +371,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.primary[500],
     borderRadius: 12,
+    zIndex: 10,
   },
   handleTopLeft: {
     top: -12,

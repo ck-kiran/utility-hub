@@ -27,6 +27,7 @@ export function ResizeImageScreen() {
 
   const [viewMode, setViewMode] = useState<ViewMode>('select');
   const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
+  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     status: 'idle',
     progress: 0,
@@ -190,8 +191,100 @@ export function ResizeImageScreen() {
           {/* Crop View */}
           {viewMode === 'crop' && selectedImage && (
             <View style={styles.section}>
+              {/* Aspect Ratio Presets */}
+              <View style={styles.aspectRatioContainer}>
+                <Text
+                  variant="caption"
+                  color={colors.text.secondary}
+                  style={styles.aspectRatioLabel}
+                >
+                  Aspect Ratio:
+                </Text>
+                <View style={styles.aspectRatioButtons}>
+                  <Pressable
+                    style={[
+                      styles.aspectRatioButton,
+                      aspectRatio === null && styles.aspectRatioButtonActive,
+                    ]}
+                    onPress={() => setAspectRatio(null)}
+                  >
+                    <Text
+                      variant="caption"
+                      color={aspectRatio === null ? colors.surface : colors.text.primary}
+                      style={styles.aspectRatioButtonText}
+                    >
+                      Free
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.aspectRatioButton,
+                      aspectRatio === 1 && styles.aspectRatioButtonActive,
+                    ]}
+                    onPress={() => setAspectRatio(1)}
+                  >
+                    <Text
+                      variant="caption"
+                      color={aspectRatio === 1 ? colors.surface : colors.text.primary}
+                      style={styles.aspectRatioButtonText}
+                    >
+                      1:1
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.aspectRatioButton,
+                      aspectRatio === 16 / 9 && styles.aspectRatioButtonActive,
+                    ]}
+                    onPress={() => setAspectRatio(16 / 9)}
+                  >
+                    <Text
+                      variant="caption"
+                      color={aspectRatio === 16 / 9 ? colors.surface : colors.text.primary}
+                      style={styles.aspectRatioButtonText}
+                    >
+                      16:9
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.aspectRatioButton,
+                      aspectRatio === 4 / 3 && styles.aspectRatioButtonActive,
+                    ]}
+                    onPress={() => setAspectRatio(4 / 3)}
+                  >
+                    <Text
+                      variant="caption"
+                      color={aspectRatio === 4 / 3 ? colors.surface : colors.text.primary}
+                      style={styles.aspectRatioButtonText}
+                    >
+                      4:3
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.aspectRatioButton,
+                      aspectRatio === 3 / 2 && styles.aspectRatioButtonActive,
+                    ]}
+                    onPress={() => setAspectRatio(3 / 2)}
+                  >
+                    <Text
+                      variant="caption"
+                      color={aspectRatio === 3 / 2 ? colors.surface : colors.text.primary}
+                      style={styles.aspectRatioButtonText}
+                    >
+                      3:2
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+
               <View style={styles.cropContainer}>
-                <ImageCropper imageUri={selectedImage.uri} onCropChange={setCropArea} />
+                <ImageCropper
+                  imageUri={selectedImage.uri}
+                  onCropChange={setCropArea}
+                  aspectRatio={aspectRatio}
+                />
               </View>
 
               <View style={styles.instructionsCard}>
@@ -437,6 +530,34 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+  },
+  aspectRatioContainer: {
+    marginBottom: spacing[3],
+  },
+  aspectRatioLabel: {
+    marginBottom: spacing[2],
+  },
+  aspectRatioButtons: {
+    flexDirection: 'row',
+    gap: spacing[2],
+  },
+  aspectRatioButton: {
+    flex: 1,
+    paddingVertical: spacing[2],
+    paddingHorizontal: spacing[3],
+    borderRadius: spacing[2],
+    borderWidth: 1,
+    borderColor: colors.neutral[300],
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aspectRatioButtonActive: {
+    backgroundColor: colors.primary[500],
+    borderColor: colors.primary[500],
+  },
+  aspectRatioButtonText: {
+    fontWeight: '600',
   },
 });
 
