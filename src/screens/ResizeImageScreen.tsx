@@ -1,110 +1,81 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, Pressable, ScrollView, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
 import { Text, Button } from '@/components/common';
 import { ProgressIndicator } from '@/components/pdf-tools';
-import { ImageCropper, CropArea } from '@/components/image-tools';
-import { useFilePicker } from '@/hooks';
 import { colors, spacing } from '@/theme';
 import { ProcessingState } from '@/types/pdf';
 import { t } from '@/i18n';
 
-type ViewMode = 'select' | 'crop' | 'result';
+type ViewMode = 'select' | 'result';
+type AspectRatio = [number, number] | undefined;
+
+const ASPECT_RATIOS: { label: string; value: AspectRatio }[] = [
+  { label: 'Free', value: undefined },
+  { label: '1:1', value: [1, 1] },
+  { label: '16:9', value: [16, 9] },
+  { label: '4:3', value: [4, 3] },
+  { label: '3:2', value: [3, 2] },
+];
 
 export function ResizeImageScreen() {
   const navigation = useNavigation();
-  const {
-    files: images,
-    pickImages,
-    clearFiles,
-  } = useFilePicker({
-    fileType: 'image',
-    multiple: false,
-  });
 
   const [viewMode, setViewMode] = useState<ViewMode>('select');
-  const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
-  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(undefined);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     status: 'idle',
     progress: 0,
   });
 
-  const selectedImage = images.length > 0 ? images[0] : null;
-
-  // Switch to crop mode when image is selected
-  useEffect(() => {
-    if (images.length > 0 && viewMode === 'select') {
-      setViewMode('crop');
-    }
-  }, [images, viewMode]);
-
   const handleBack = () => {
-    if (viewMode === 'crop') {
-      setViewMode('select');
-    } else {
-      navigation.goBack();
-    }
+    navigation.goBack();
   };
 
   const handleClear = () => {
-    clearFiles();
+    setSelectedImage(null);
     setViewMode('select');
     setProcessingState({ status: 'idle', progress: 0 });
   };
 
-  const handleSelectImage = async () => {
-    await pickImages();
-    // pickImages updates the files state in the hook
-    // The view mode will be set via useEffect when images change
-  };
-
-  const handleApplyCrop = useCallback(async () => {
-    if (!selectedImage) return;
-
-    setProcessingState({ status: 'processing', progress: 0, message: 'Cropping image...' });
-
+  const handleSelectAndCropImage = async () => {
     try {
-      const { cropImage } = await import('@/services/imageService');
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please grant access to your photo library.');
+        return;
+      }
 
-      setProcessingState({
-        status: 'processing',
-        progress: 0.3,
-        message: 'Processing image...',
+      // Launch image picker with crop editor
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: selectedAspectRatio,
+        quality: 1,
       });
 
-      const outputUri = await cropImage({
-        imageUri: selectedImage.uri,
-        cropArea,
-        onProgress: (progress: number, message: string) => {
-          setProcessingState({
-            status: 'processing',
-            progress,
-            message,
-          });
-        },
-      });
-
-      setProcessingState({
-        status: 'complete',
-        progress: 1,
-        message: 'Image cropped successfully!',
-        outputUri,
-      });
-
-      setViewMode('result');
-    } catch (err) {
-      setProcessingState({
-        status: 'error',
-        progress: 0,
-        message: err instanceof Error ? err.message : t('common.error'),
-      });
-      Alert.alert(t('common.error'), 'Failed to crop image');
+      if (!result.canceled && result.assets[0]) {
+        const croppedUri = result.assets[0].uri;
+        setSelectedImage(croppedUri);
+        setProcessingState({
+          status: 'complete',
+          progress: 1,
+          message: 'Image cropped successfully!',
+          outputUri: croppedUri,
+        });
+        setViewMode('result');
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert(t('common.error'), 'Failed to pick and crop image');
     }
-  }, [selectedImage, cropArea]);
+  };
 
   const handleSave = useCallback(async () => {
     if (processingState.outputUri) {
@@ -126,7 +97,7 @@ export function ResizeImageScreen() {
 
   const handleCropAnother = () => {
     setViewMode('select');
-    clearFiles();
+    setSelectedImage(null);
     setProcessingState({ status: 'idle', progress: 0 });
   };
 
@@ -140,7 +111,7 @@ export function ResizeImageScreen() {
           </Pressable>
           <View style={styles.headerTitleContainer}>
             <Text variant="h3" style={styles.headerTitle}>
-              {viewMode === 'crop' ? 'Crop Image' : t('tools.resize_image')}
+              {t('tools.resize_image')}
             </Text>
           </View>
           <Pressable
@@ -161,19 +132,52 @@ export function ResizeImageScreen() {
           {/* Select Image View */}
           {viewMode === 'select' && !selectedImage && (
             <View style={styles.section}>
+              {/* Aspect Ratio Selection */}
+              <View style={styles.aspectRatioCard}>
+                <Text variant="body" style={styles.aspectRatioTitle}>
+                  Select Aspect Ratio
+                </Text>
+                <View style={styles.aspectRatioButtons}>
+                  {ASPECT_RATIOS.map((ratio) => (
+                    <Pressable
+                      key={ratio.label}
+                      style={[
+                        styles.aspectRatioButton,
+                        selectedAspectRatio === ratio.value && styles.aspectRatioButtonActive,
+                      ]}
+                      onPress={() => setSelectedAspectRatio(ratio.value)}
+                    >
+                      <Text
+                        variant="caption"
+                        color={
+                          selectedAspectRatio === ratio.value ? colors.surface : colors.text.primary
+                        }
+                        style={styles.aspectRatioButtonText}
+                      >
+                        {ratio.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+
               <View style={styles.uploadCard}>
                 <Ionicons name="image-outline" size={64} color={colors.text.tertiary} />
                 <Text variant="body" color={colors.text.secondary} style={styles.uploadText}>
-                  Select an image to resize and crop
+                  Select an image to crop
+                </Text>
+                <Text variant="caption" color={colors.text.tertiary} style={styles.uploadSubtext}>
+                  Uses native crop editor for smooth experience
                 </Text>
                 <Button
                   variant="primary"
                   size="md"
-                  leftIcon={<Ionicons name="add" size={20} color={colors.surface} />}
-                  onPress={handleSelectImage}
+                  leftIcon={<Ionicons name="crop" size={20} color={colors.surface} />}
+                  onPress={handleSelectAndCropImage}
                   testID="select-image-button"
+                  style={styles.selectButton}
                 >
-                  Select Image
+                  Select & Crop Image
                 </Button>
               </View>
 
@@ -181,120 +185,9 @@ export function ResizeImageScreen() {
               <View style={styles.infoCard}>
                 <Ionicons name="information-circle" size={24} color={colors.info[500]} />
                 <Text variant="caption" color={colors.text.secondary} style={styles.infoText}>
-                  Interactive Crop: Drag corners to adjust crop area. Supports all standard image
-                  formats (JPG, PNG, etc.)
+                  Native Crop UI: Select an aspect ratio above, then pick your image. You&apos;ll be
+                  able to crop it using your device&apos;s built-in crop tool.
                 </Text>
-              </View>
-            </View>
-          )}
-
-          {/* Crop View */}
-          {viewMode === 'crop' && selectedImage && (
-            <View style={styles.section}>
-              {/* Aspect Ratio Presets */}
-              <View style={styles.aspectRatioContainer}>
-                <Text
-                  variant="caption"
-                  color={colors.text.secondary}
-                  style={styles.aspectRatioLabel}
-                >
-                  Aspect Ratio:
-                </Text>
-                <View style={styles.aspectRatioButtons}>
-                  <Pressable
-                    style={[
-                      styles.aspectRatioButton,
-                      aspectRatio === null && styles.aspectRatioButtonActive,
-                    ]}
-                    onPress={() => setAspectRatio(null)}
-                  >
-                    <Text
-                      variant="caption"
-                      color={aspectRatio === null ? colors.surface : colors.text.primary}
-                      style={styles.aspectRatioButtonText}
-                    >
-                      Free
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.aspectRatioButton,
-                      aspectRatio === 1 && styles.aspectRatioButtonActive,
-                    ]}
-                    onPress={() => setAspectRatio(1)}
-                  >
-                    <Text
-                      variant="caption"
-                      color={aspectRatio === 1 ? colors.surface : colors.text.primary}
-                      style={styles.aspectRatioButtonText}
-                    >
-                      1:1
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.aspectRatioButton,
-                      aspectRatio === 16 / 9 && styles.aspectRatioButtonActive,
-                    ]}
-                    onPress={() => setAspectRatio(16 / 9)}
-                  >
-                    <Text
-                      variant="caption"
-                      color={aspectRatio === 16 / 9 ? colors.surface : colors.text.primary}
-                      style={styles.aspectRatioButtonText}
-                    >
-                      16:9
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.aspectRatioButton,
-                      aspectRatio === 4 / 3 && styles.aspectRatioButtonActive,
-                    ]}
-                    onPress={() => setAspectRatio(4 / 3)}
-                  >
-                    <Text
-                      variant="caption"
-                      color={aspectRatio === 4 / 3 ? colors.surface : colors.text.primary}
-                      style={styles.aspectRatioButtonText}
-                    >
-                      4:3
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.aspectRatioButton,
-                      aspectRatio === 3 / 2 && styles.aspectRatioButtonActive,
-                    ]}
-                    onPress={() => setAspectRatio(3 / 2)}
-                  >
-                    <Text
-                      variant="caption"
-                      color={aspectRatio === 3 / 2 ? colors.surface : colors.text.primary}
-                      style={styles.aspectRatioButtonText}
-                    >
-                      3:2
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-
-              <View style={styles.cropContainer}>
-                <ImageCropper
-                  imageUri={selectedImage.uri}
-                  onCropChange={setCropArea}
-                  aspectRatio={aspectRatio}
-                />
-              </View>
-
-              <View style={styles.instructionsCard}>
-                <Ionicons name="hand-left-outline" size={20} color={colors.primary[500]} />
-                <View style={styles.instructionsText}>
-                  <Text variant="caption" color={colors.text.secondary}>
-                    • Drag corners to resize crop area{'\n'}• Tap inside to move crop area{'\n'}•
-                    Use grid for alignment
-                  </Text>
-                </View>
               </View>
             </View>
           )}
@@ -343,20 +236,6 @@ export function ResizeImageScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          {viewMode === 'crop' && selectedImage && (
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              leftIcon={<Ionicons name="checkmark" size={20} color={colors.surface} />}
-              onPress={handleApplyCrop}
-              disabled={processingState.status === 'processing'}
-              testID="apply-crop-button"
-            >
-              Apply Crop
-            </Button>
-          )}
-
           {viewMode === 'result' && processingState.status === 'complete' && (
             <View style={styles.actionButtons}>
               <Button
@@ -426,6 +305,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
     marginTop: spacing[4],
   },
+  aspectRatioCard: {
+    backgroundColor: colors.surface,
+    borderRadius: spacing[3],
+    padding: spacing[4],
+    marginBottom: spacing[4],
+    borderWidth: 1,
+    borderColor: colors.neutral[200],
+  },
+  aspectRatioTitle: {
+    marginBottom: spacing[3],
+    fontWeight: '600',
+  },
+  aspectRatioButtons: {
+    flexDirection: 'row',
+    gap: spacing[2],
+  },
+  aspectRatioButton: {
+    flex: 1,
+    paddingVertical: spacing[2],
+    paddingHorizontal: spacing[2],
+    borderRadius: spacing[2],
+    borderWidth: 1,
+    borderColor: colors.neutral[300],
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aspectRatioButtonActive: {
+    backgroundColor: colors.primary[500],
+    borderColor: colors.primary[500],
+  },
+  aspectRatioButtonText: {
+    fontWeight: '600',
+  },
   uploadCard: {
     backgroundColor: colors.neutral[50],
     borderRadius: spacing[3],
@@ -440,7 +353,14 @@ const styles = StyleSheet.create({
   uploadText: {
     textAlign: 'center',
     marginTop: spacing[3],
+    marginBottom: spacing[1],
+  },
+  uploadSubtext: {
+    textAlign: 'center',
     marginBottom: spacing[4],
+  },
+  selectButton: {
+    minWidth: 200,
   },
   infoCard: {
     flexDirection: 'row',
@@ -453,27 +373,6 @@ const styles = StyleSheet.create({
     marginTop: spacing[4],
   },
   infoText: {
-    marginLeft: spacing[2],
-    flex: 1,
-  },
-  cropContainer: {
-    backgroundColor: colors.neutral[900],
-    borderRadius: spacing[2],
-    padding: spacing[3],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  instructionsCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: spacing[3],
-    borderRadius: spacing[2],
-    backgroundColor: colors.primary[50],
-    borderWidth: 1,
-    borderColor: colors.primary[200],
-    marginTop: spacing[4],
-  },
-  instructionsText: {
     marginLeft: spacing[2],
     flex: 1,
   },
@@ -530,34 +429,6 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-  },
-  aspectRatioContainer: {
-    marginBottom: spacing[3],
-  },
-  aspectRatioLabel: {
-    marginBottom: spacing[2],
-  },
-  aspectRatioButtons: {
-    flexDirection: 'row',
-    gap: spacing[2],
-  },
-  aspectRatioButton: {
-    flex: 1,
-    paddingVertical: spacing[2],
-    paddingHorizontal: spacing[3],
-    borderRadius: spacing[2],
-    borderWidth: 1,
-    borderColor: colors.neutral[300],
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  aspectRatioButtonActive: {
-    backgroundColor: colors.primary[500],
-    borderColor: colors.primary[500],
-  },
-  aspectRatioButtonText: {
-    fontWeight: '600',
   },
 });
 
