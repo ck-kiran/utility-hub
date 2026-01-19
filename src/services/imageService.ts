@@ -24,6 +24,17 @@ export interface CompressImageOptions {
   onProgress?: (progress: number, message: string) => void;
 }
 
+export interface CropImageOptions {
+  imageUri: string;
+  cropArea: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  onProgress?: (progress: number, message: string) => void;
+}
+
 export interface ImageInfo {
   width: number;
   height: number;
@@ -244,6 +255,63 @@ export async function batchResizeImages(
   }
 
   return results;
+}
+
+/**
+ * Crop an image based on specified crop area
+ */
+export async function cropImage(options: CropImageOptions): Promise<string> {
+  const { imageUri, cropArea, onProgress } = options;
+
+  try {
+    onProgress?.(0, 'Loading image...');
+
+    // Validate crop area
+    if (cropArea.width <= 0 || cropArea.height <= 0) {
+      throw new Error('Invalid crop dimensions');
+    }
+
+    onProgress?.(0.3, 'Cropping image...');
+
+    const actions: ImageManipulator.Action[] = [
+      {
+        crop: {
+          originX: cropArea.x,
+          originY: cropArea.y,
+          width: cropArea.width,
+          height: cropArea.height,
+        },
+      },
+    ];
+
+    onProgress?.(0.6, 'Processing...');
+
+    // Crop image
+    const result = await ImageManipulator.manipulateAsync(imageUri, actions, {
+      compress: 1,
+      format: ImageManipulator.SaveFormat.PNG,
+    });
+
+    onProgress?.(0.9, 'Saving cropped image...');
+
+    // Copy to cache directory
+    const fileName = `cropped-${Date.now()}.png`;
+    const outputFile = new File(Paths.cache, fileName);
+
+    // Read the manipulated image and save it
+    const manipulatedFile = new File(result.uri);
+    const imageData = await manipulatedFile.arrayBuffer();
+
+    outputFile.create({ overwrite: true });
+    outputFile.write(new Uint8Array(imageData));
+
+    onProgress?.(1, 'Image cropped successfully!');
+
+    return outputFile.uri;
+  } catch (error) {
+    console.error('Error cropping image:', error);
+    throw new Error('Failed to crop image');
+  }
 }
 
 /**
