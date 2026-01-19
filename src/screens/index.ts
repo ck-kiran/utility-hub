@@ -13,5 +13,7 @@ export { MergePdfScreen } from './MergePdfScreen';
 export { ImageToPdfScreen } from './ImageToPdfScreen';
 export { PdfToImageScreen } from './PdfToImageScreen';
 export { SplitPdfScreen } from './SplitPdfScreen';
+export { TextToAudioScreen } from './TextToAudioScreen';
+export { AudioToTextScreen } from './AudioToTextScreen';
 export { ResizeImageScreen } from './ResizeImageScreen';
 export { ConvertToJpgScreen } from './ConvertToJpgScreen';
