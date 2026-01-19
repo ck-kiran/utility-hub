@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Pressable, ScrollView, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -34,6 +34,13 @@ export function ResizeImageScreen() {
 
   const selectedImage = images.length > 0 ? images[0] : null;
 
+  // Switch to crop mode when image is selected
+  useEffect(() => {
+    if (images.length > 0 && viewMode === 'select') {
+      setViewMode('crop');
+    }
+  }, [images, viewMode]);
+
   const handleBack = () => {
     if (viewMode === 'crop') {
       setViewMode('select');
@@ -49,10 +56,9 @@ export function ResizeImageScreen() {
   };
 
   const handleSelectImage = async () => {
-    const result = await pickImages();
-    if (result && result.length > 0) {
-      setViewMode('crop');
-    }
+    await pickImages();
+    // pickImages updates the files state in the hook
+    // The view mode will be set via useEffect when images change
   };
 
   const handleApplyCrop = useCallback(async () => {
