@@ -13,6 +13,8 @@ export type RootStackParamList = {
   ImageToPdf: undefined;
   PdfToImage: undefined;
   SplitPdf: undefined;
+  TextToAudio: undefined;
+  AudioToText: undefined;
   ResizeImage: undefined;
   ConvertToJpg: undefined;
   PrivacyPolicy: undefined;
@@ -65,5 +67,7 @@ export type MergePdfScreenProps = RootStackScreenProps<'MergePdf'>;
 export type ImageToPdfScreenProps = RootStackScreenProps<'ImageToPdf'>;
 export type PdfToImageScreenProps = RootStackScreenProps<'PdfToImage'>;
 export type SplitPdfScreenProps = RootStackScreenProps<'SplitPdf'>;
+export type TextToAudioScreenProps = RootStackScreenProps<'TextToAudio'>;
+export type AudioToTextScreenProps = RootStackScreenProps<'AudioToText'>;
 export type ResizeImageScreenProps = RootStackScreenProps<'ResizeImage'>;
 export type ConvertToJpgScreenProps = RootStackScreenProps<'ConvertToJpg'>;
