@@ -11,7 +11,6 @@ import {
 } from 'expo-audio';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Text, Button } from '@/components/common';
 import { colors, spacing } from '@/theme';
 import { t } from '@/i18n';
@@ -35,44 +34,11 @@ export function AudioToTextScreen() {
   const [playerSource, setPlayerSource] = useState<string | null>(null);
   const player = useAudioPlayer(playerSource);
 
-  // Check if speech recognition is available
+  // Speech recognition is not available in Expo Go
+  // Remove these unused states and effects since auto transcribe is disabled
   useEffect(() => {
-    ExpoSpeechRecognitionModule.getStateAsync()
-      .then(() => {
-        setRecognitionAvailable(true);
-      })
-      .catch(() => {
-        setRecognitionAvailable(false);
-      });
+    setRecognitionAvailable(false);
   }, []);
-
-  // Handle speech recognition events
-  useSpeechRecognitionEvent('result', (event) => {
-    const transcript = event.results[0]?.transcript;
-    if (transcript) {
-      setTranscriptionText((prev) => prev + (prev ? ' ' : '') + transcript);
-    }
-  });
-
-  useSpeechRecognitionEvent('end', () => {
-    setIsRecognizing(false);
-    setViewMode('recorded');
-  });
-
-  useSpeechRecognitionEvent('error', (event) => {
-    setIsRecognizing(false);
-    setViewMode('recorded');
-    Alert.alert('Recognition Error', event.error || 'Failed to recognize speech');
-  });
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (isRecognizing) {
-        ExpoSpeechRecognitionModule.stop();
-      }
-    };
-  }, [isRecognizing]);
 
   const handleBack = () => {
     navigation.goBack();
@@ -80,10 +46,7 @@ export function AudioToTextScreen() {
 
   const handleClear = async () => {
     try {
-      if (isRecognizing) {
-        ExpoSpeechRecognitionModule.stop();
-        setIsRecognizing(false);
-      }
+      setIsRecognizing(false);
       setViewMode('idle');
       setRecordingUri(null);
       setTranscriptionText('');
@@ -156,51 +119,17 @@ export function AudioToTextScreen() {
   }, []);
 
   const handleAutoTranscribe = useCallback(async () => {
-    if (!recognitionAvailable) {
-      Alert.alert(
-        'Feature Unavailable',
-        'Speech recognition requires a development build.\n\nThis feature is not available in Expo Go. Please build the app with "npx expo run:ios" or "npx expo run:android" to use automatic transcription.\n\nAlternatively, you can type the transcription manually.'
-      );
-      return;
-    }
-
-    try {
-      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-      if (!granted) {
-        Alert.alert(
-          'Permission Required',
-          'Please grant microphone permission for speech recognition'
-        );
-        return;
-      }
-
-      setIsRecognizing(true);
-      setViewMode('recognizing');
-
-      await ExpoSpeechRecognitionModule.start({
-        lang: 'en-US',
-        interimResults: true,
-        maxAlternatives: 1,
-        continuous: true,
-        requiresOnDeviceRecognition: false,
-        addsPunctuation: true,
-        contextualStrings: [],
-      });
-    } catch {
-      setIsRecognizing(false);
-      setViewMode('recorded');
-      Alert.alert(t('common.error'), 'Failed to start speech recognition');
-    }
-  }, [recognitionAvailable]);
+    // Speech recognition is only available in development builds
+    // For now, show unavailable message
+    Alert.alert(
+      'Feature Unavailable',
+      "Automatic speech recognition requires a development build.\n\nThis feature is not available in Expo Go. Please build the app with:\n\n• npx expo run:ios\n• npx expo run:android\n\nIn the meantime, you can type the transcription manually using your keyboard's voice input feature."
+    );
+  }, []);
 
   const handleStopTranscribe = useCallback(async () => {
-    try {
-      ExpoSpeechRecognitionModule.stop();
-      setIsRecognizing(false);
-      setViewMode('recorded');
-    } catch {
-      // Ignore stop errors
-    }
+    setIsRecognizing(false);
+    setViewMode('recorded');
   }, []);
 
   const handleDownloadTranscription = useCallback(async () => {
