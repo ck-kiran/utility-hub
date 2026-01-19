@@ -87,6 +87,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.audio_to_text',
     descriptionKey: 'tools.audio_to_text_desc',
     icon: 'mic-outline',
+    route: 'AudioToText',
     isPopular: true,
     themeColor: colors.primary[500],
   },
@@ -95,6 +96,7 @@ export const TOOLS: Record<ToolId, Tool> = {
     titleKey: 'tools.text_to_audio',
     descriptionKey: 'tools.text_to_audio_desc',
     icon: 'volume-high-outline',
+    route: 'TextToAudio',
     themeColor: colors.primary[500],
   },
 

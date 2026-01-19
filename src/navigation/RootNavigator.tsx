@@ -10,6 +10,8 @@ import {
   ImageToPdfScreen,
   PdfToImageScreen,
   SplitPdfScreen,
+  TextToAudioScreen,
+  AudioToTextScreen,
   PrivacyPolicyScreen,
   HelpCenterScreen,
   LanguageSelectionScreen,
@@ -30,6 +32,8 @@ export function RootNavigator() {
       <Stack.Screen name="ImageToPdf" component={ImageToPdfScreen} />
       <Stack.Screen name="PdfToImage" component={PdfToImageScreen} />
       <Stack.Screen name="SplitPdf" component={SplitPdfScreen} />
+      <Stack.Screen name="TextToAudio" component={TextToAudioScreen} />
+      <Stack.Screen name="AudioToText" component={AudioToTextScreen} />
       <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
