@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Pressable, ScrollView, Alert, TextInput } from 'react-native';
+import { View, StyleSheet, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
+import { useSpeechRecognitionEvent, ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
 import { Text, Button } from '@/components/common';
 import { colors, spacing } from '@/theme';
 import { t } from '@/i18n';
@@ -23,6 +24,32 @@ export function AudioToTextScreen() {
   const [transcriptionText, setTranscriptionText] = useState('');
   const [audioSource, setAudioSource] = useState<AudioSource | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('');
+  const [isRecognizing, setIsRecognizing] = useState(false);
+  const [recognitionError, setRecognitionError] = useState<string | null>(null);
+
+  // Speech recognition event handlers
+  useSpeechRecognitionEvent('start', () => {
+    setIsRecognizing(true);
+    setRecognitionError(null);
+  });
+
+  useSpeechRecognitionEvent('end', () => {
+    setIsRecognizing(false);
+  });
+
+  useSpeechRecognitionEvent('result', (event) => {
+    const results = event.results;
+    if (results && results.length > 0) {
+      const transcript = results.map((result) => result.transcript).join(' ');
+      setTranscriptionText(transcript);
+    }
+  });
+
+  useSpeechRecognitionEvent('error', (event) => {
+    setIsRecognizing(false);
+    setRecognitionError(event.error);
+    console.error('Speech recognition error:', event.error);
+  });
 
   useEffect(() => {
     return () => {
@@ -33,8 +60,16 @@ export function AudioToTextScreen() {
       if (sound) {
         sound.unloadAsync().catch(console.error);
       }
+      // Stop speech recognition if running
+      if (isRecognizing) {
+        try {
+          ExpoSpeechRecognitionModule.stop();
+        } catch (err) {
+          console.error(err);
+        }
+      }
     };
-  }, [recording, sound]);
+  }, [recording, sound, isRecognizing]);
 
   const handleBack = () => {
     navigation.goBack();
@@ -188,6 +223,43 @@ export function AudioToTextScreen() {
       Alert.alert(t('common.error'), 'Failed to pick audio file');
     }
   }, []);
+
+  const handleStartTranscription = useCallback(async () => {
+    if (!recordingUri) return;
+
+    try {
+      // Request permission
+      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!granted) {
+        Alert.alert('Permission Required', 'Please grant microphone permission for transcription');
+        return;
+      }
+
+      // Start speech recognition
+      await ExpoSpeechRecognitionModule.start({
+        lang: 'en-US',
+        interimResults: true,
+        maxAlternatives: 1,
+        continuous: true,
+        requiresOnDeviceRecognition: false,
+      });
+
+      // Play the audio while recognizing
+      await playRecording();
+    } catch (error) {
+      console.error('Failed to start transcription:', error);
+      Alert.alert(t('common.error'), 'Failed to start automatic transcription');
+    }
+  }, [recordingUri, playRecording]);
+
+  const handleStopTranscription = useCallback(async () => {
+    try {
+      await ExpoSpeechRecognitionModule.stop();
+      await stopPlayback();
+    } catch (error) {
+      console.error('Failed to stop transcription:', error);
+    }
+  }, [stopPlayback]);
 
   const handleDownloadTranscription = useCallback(async () => {
     if (!transcriptionText.trim()) {
@@ -346,8 +418,23 @@ export function AudioToTextScreen() {
             </View>
           )}
 
-          {/* Transcription Input */}
-          {(recordingStatus === 'recorded' || recordingStatus === 'playing') && (
+          {/* Transcription Status */}
+          {isRecognizing && (
+            <View style={styles.section}>
+              <View style={styles.transcribingCard}>
+                <ActivityIndicator size="large" color={colors.primary[500]} />
+                <Text variant="body" style={styles.transcribingText}>
+                  Listening and transcribing...
+                </Text>
+                <Text variant="caption" color={colors.text.tertiary}>
+                  Speak clearly into your microphone
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Transcription Result */}
+          {transcriptionText && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text variant="labelSmall" color={colors.text.tertiary}>
@@ -357,27 +444,34 @@ export function AudioToTextScreen() {
                   {transcriptionText.length} characters
                 </Text>
               </View>
-              <TextInput
-                style={styles.transcriptionInput}
-                value={transcriptionText}
-                onChangeText={setTranscriptionText}
-                placeholder="Type or paste your transcription here...&#10;&#10;Tip: Use your keyboard's voice input while playing the audio for easier transcription."
-                placeholderTextColor={colors.text.tertiary}
-                multiline
-                textAlignVertical="top"
-                testID="transcription-input"
-              />
+              <View style={styles.transcriptionCard}>
+                <Text variant="body" style={styles.transcriptionText}>
+                  {transcriptionText}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Error Display */}
+          {recognitionError && (
+            <View style={styles.section}>
+              <View style={styles.errorCard}>
+                <Ionicons name="alert-circle" size={24} color={colors.error[500]} />
+                <Text variant="caption" color={colors.text.secondary} style={styles.errorText}>
+                  Recognition error: {recognitionError}
+                </Text>
+              </View>
             </View>
           )}
 
           {/* Info Card */}
-          {recordingStatus !== 'idle' && !transcriptionText && (
+          {recordingStatus !== 'idle' && !transcriptionText && !isRecognizing && (
             <View style={styles.section}>
               <View style={styles.infoCard}>
                 <Ionicons name="information-circle" size={24} color={colors.info[500]} />
                 <Text variant="caption" color={colors.text.secondary} style={styles.infoText}>
-                  Manual Transcription: Play the audio and type the text using your keyboard. You
-                  can enable voice input on your keyboard for easier transcription.
+                  Automatic Speech Recognition: Tap transcribe to automatically convert speech to
+                  text using your device&apos;s built-in recognition.
                 </Text>
               </View>
             </View>
@@ -413,19 +507,46 @@ export function AudioToTextScreen() {
             </Button>
           )}
 
-          {(recordingStatus === 'recorded' || recordingStatus === 'playing') &&
-            transcriptionText.trim() && (
-              <Button
-                variant="primary"
-                size="lg"
-                fullWidth
-                leftIcon={<Ionicons name="download-outline" size={20} color={colors.surface} />}
-                onPress={handleDownloadTranscription}
-                testID="download-transcription-button"
-              >
-                Download Transcription
-              </Button>
-            )}
+          {(recordingStatus === 'recorded' || recordingStatus === 'playing') && (
+            <>
+              {transcriptionText.trim() ? (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  leftIcon={<Ionicons name="download-outline" size={20} color={colors.surface} />}
+                  onPress={handleDownloadTranscription}
+                  testID="download-transcription-button"
+                >
+                  Download Transcription
+                </Button>
+              ) : isRecognizing ? (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  leftIcon={<Ionicons name="stop" size={20} color={colors.surface} />}
+                  onPress={handleStopTranscription}
+                  testID="stop-transcription-button"
+                  style={{ backgroundColor: colors.error[500] }}
+                >
+                  Stop Transcribing
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  leftIcon={<Ionicons name="text-outline" size={20} color={colors.surface} />}
+                  onPress={handleStartTranscription}
+                  disabled={recordingStatus === 'playing'}
+                  testID="transcribe-button"
+                >
+                  Transcribe Audio
+                </Button>
+              )}
+            </>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -511,16 +632,42 @@ const styles = StyleSheet.create({
   playbackControls: {
     alignItems: 'center',
   },
-  transcriptionInput: {
+  transcribingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: spacing[2],
+    borderWidth: 1,
+    borderColor: colors.primary[200],
+    padding: spacing[4],
+    alignItems: 'center',
+  },
+  transcribingText: {
+    marginTop: spacing[3],
+    textAlign: 'center',
+    color: colors.primary[700],
+  },
+  transcriptionCard: {
+    backgroundColor: colors.surface,
+    borderRadius: spacing[2],
     borderWidth: 1,
     borderColor: colors.neutral[200],
-    borderRadius: spacing[2],
+    padding: spacing[4],
+  },
+  transcriptionText: {
+    lineHeight: 24,
+  },
+  errorCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     padding: spacing[3],
-    fontSize: 16,
-    color: colors.text.primary,
-    backgroundColor: colors.surface,
-    minHeight: 200,
-    maxHeight: 300,
+    borderRadius: spacing[2],
+    backgroundColor: colors.error[50],
+    borderWidth: 1,
+    borderColor: colors.error[200],
+  },
+  errorText: {
+    marginLeft: spacing[2],
+    flex: 1,
+    color: colors.error[700],
   },
   infoCard: {
     flexDirection: 'row',
