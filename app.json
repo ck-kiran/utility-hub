@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "utility-hub-temp",
-    "slug": "utility-hub-temp",
+    "slug": "utility-hub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,11 +21,18 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.kiran.c.utilityhubtemp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-asset", "expo-font"]
+    "plugins": ["expo-asset", "expo-font"],
+    "extra": {
+      "eas": {
+        "projectId": "005d0b96-0611-4444-a258-53a3f3058e4e"
+      }
+    },
+    "owner": "utility-hub"
   }
 }
