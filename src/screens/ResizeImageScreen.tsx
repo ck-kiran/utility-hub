@@ -1,18 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Pressable, ScrollView, Alert, Image } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Pressable, ScrollView, Alert, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import { Text, Button } from '@/components/common';
 import { ProgressIndicator } from '@/components/pdf-tools';
-import { ImageCropper, CropArea } from '@/components/image-tools';
 import { useFilePicker } from '@/hooks';
 import { colors, spacing } from '@/theme';
 import { ProcessingState } from '@/types/pdf';
 import { t } from '@/i18n';
 
-type ViewMode = 'select' | 'crop' | 'result';
+type ResizePreset = 'small' | 'medium' | 'large' | 'custom';
 
 export function ResizeImageScreen() {
   const navigation = useNavigation();
@@ -25,8 +24,10 @@ export function ResizeImageScreen() {
     multiple: false,
   });
 
-  const [viewMode, setViewMode] = useState<ViewMode>('select');
-  const [cropArea, setCropArea] = useState<CropArea>({ x: 0, y: 0, width: 0, height: 0 });
+  const [preset, setPreset] = useState<ResizePreset>('medium');
+  const [customWidth, setCustomWidth] = useState('');
+  const [customHeight, setCustomHeight] = useState('');
+  const [maintainAspectRatio, setMaintainAspectRatio] = useState(true);
   const [processingState, setProcessingState] = useState<ProcessingState>({
     status: 'idle',
     progress: 0,
@@ -34,50 +35,54 @@ export function ResizeImageScreen() {
 
   const selectedImage = images.length > 0 ? images[0] : null;
 
-  // Switch to crop mode when image is selected
-  useEffect(() => {
-    if (images.length > 0 && viewMode === 'select') {
-      setViewMode('crop');
-    }
-  }, [images, viewMode]);
-
   const handleBack = () => {
-    if (viewMode === 'crop') {
-      setViewMode('select');
-    } else {
-      navigation.goBack();
-    }
+    navigation.goBack();
   };
 
   const handleClear = () => {
     clearFiles();
-    setViewMode('select');
+    setPreset('medium');
+    setCustomWidth('');
+    setCustomHeight('');
     setProcessingState({ status: 'idle', progress: 0 });
   };
 
-  const handleSelectImage = async () => {
-    await pickImages();
-    // pickImages updates the files state in the hook
-    // The view mode will be set via useEffect when images change
-  };
+  const handleResize = useCallback(async () => {
+    if (!selectedImage) {
+      Alert.alert(t('common.error'), 'Please select an image to resize');
+      return;
+    }
 
-  const handleApplyCrop = useCallback(async () => {
-    if (!selectedImage) return;
+    // Validate custom dimensions
+    if (preset === 'custom') {
+      const width = parseInt(customWidth);
+      const height = parseInt(customHeight);
 
-    setProcessingState({ status: 'processing', progress: 0, message: 'Cropping image...' });
+      if (!customWidth && !customHeight) {
+        Alert.alert(t('common.error'), 'Please enter at least width or height');
+        return;
+      }
+
+      if ((customWidth && isNaN(width)) || (customHeight && isNaN(height))) {
+        Alert.alert(t('common.error'), 'Please enter valid dimensions');
+        return;
+      }
+
+      if ((customWidth && width <= 0) || (customHeight && height <= 0)) {
+        Alert.alert(t('common.error'), 'Dimensions must be greater than 0');
+        return;
+      }
+    }
+
+    setProcessingState({ status: 'processing', progress: 0, message: 'Starting...' });
 
     try {
-      const { cropImage } = await import('@/services/imageService');
+      const { resizeImage } = await import('@/services/imageService');
 
-      setProcessingState({
-        status: 'processing',
-        progress: 0.3,
-        message: 'Processing image...',
-      });
-
-      const outputUri = await cropImage({
+      const baseOptions = {
         imageUri: selectedImage.uri,
-        cropArea,
+        maintainAspectRatio,
+        quality: 0.9,
         onProgress: (progress: number, message: string) => {
           setProcessingState({
             status: 'processing',
@@ -85,25 +90,39 @@ export function ResizeImageScreen() {
             message,
           });
         },
-      });
+      };
+
+      const options =
+        preset === 'custom'
+          ? {
+              ...baseOptions,
+              width: customWidth ? parseInt(customWidth) : undefined,
+              height: customHeight ? parseInt(customHeight) : undefined,
+            }
+          : {
+              ...baseOptions,
+              preset,
+            };
+
+      const outputUri = await resizeImage(options);
+
+      const presetText =
+        preset === 'custom' ? `${customWidth || 'auto'}x${customHeight || 'auto'}` : preset;
 
       setProcessingState({
         status: 'complete',
         progress: 1,
-        message: 'Image cropped successfully!',
+        message: `Image resized to ${presetText}!`,
         outputUri,
       });
-
-      setViewMode('result');
     } catch (err) {
       setProcessingState({
         status: 'error',
         progress: 0,
         message: err instanceof Error ? err.message : t('common.error'),
       });
-      Alert.alert(t('common.error'), 'Failed to crop image');
     }
-  }, [selectedImage, cropArea]);
+  }, [selectedImage, preset, customWidth, customHeight, maintainAspectRatio]);
 
   const handleSave = useCallback(async () => {
     if (processingState.outputUri) {
@@ -123,11 +142,15 @@ export function ResizeImageScreen() {
     }
   }, [processingState.outputUri]);
 
-  const handleCropAnother = () => {
-    setViewMode('select');
-    clearFiles();
-    setProcessingState({ status: 'idle', progress: 0 });
-  };
+  const canResize = selectedImage && processingState.status !== 'processing';
+  const canSave = processingState.status === 'complete' && processingState.outputUri;
+
+  const presetOptions = [
+    { value: 'small', label: 'Small (640x480)', icon: 'contract-outline' },
+    { value: 'medium', label: 'Medium (1280x720)', icon: 'resize-outline' },
+    { value: 'large', label: 'Large (1920x1080)', icon: 'expand-outline' },
+    { value: 'custom', label: 'Custom Size', icon: 'settings-outline' },
+  ] as const;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -139,7 +162,7 @@ export function ResizeImageScreen() {
           </Pressable>
           <View style={styles.headerTitleContainer}>
             <Text variant="h3" style={styles.headerTitle}>
-              {viewMode === 'crop' ? 'Crop Image' : t('tools.resize_image')}
+              {t('tools.resize_image')}
             </Text>
           </View>
           <Pressable
@@ -157,136 +180,172 @@ export function ResizeImageScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Select Image View */}
-          {viewMode === 'select' && !selectedImage && (
-            <View style={styles.section}>
-              <View style={styles.uploadCard}>
-                <Ionicons name="image-outline" size={64} color={colors.text.tertiary} />
-                <Text variant="body" color={colors.text.secondary} style={styles.uploadText}>
-                  Select an image to resize and crop
+          {/* Instructions */}
+          <View style={styles.section}>
+            <Text variant="body" color={colors.text.secondary}>
+              Select an image and choose dimensions to resize it
+            </Text>
+          </View>
+
+          {/* Image Selection */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text variant="labelSmall" color={colors.text.tertiary}>
+                IMAGE
+              </Text>
+            </View>
+            {selectedImage ? (
+              <View style={styles.imagePreview}>
+                <Ionicons name="image" size={48} color={colors.primary[500]} />
+                <Text variant="body" style={styles.imageName}>
+                  {selectedImage.name}
                 </Text>
-                <Button
-                  variant="primary"
-                  size="md"
-                  leftIcon={<Ionicons name="add" size={20} color={colors.surface} />}
-                  onPress={handleSelectImage}
-                  testID="select-image-button"
+                <Text variant="caption" color={colors.text.tertiary}>
+                  {(selectedImage.size / 1024).toFixed(2)} KB
+                </Text>
+              </View>
+            ) : (
+              <Button
+                variant="outline"
+                size="md"
+                fullWidth
+                leftIcon={<Ionicons name="image-outline" size={20} color={colors.primary[500]} />}
+                onPress={pickImages}
+                testID="select-image-button"
+              >
+                Select Image
+              </Button>
+            )}
+          </View>
+
+          {/* Preset Selection */}
+          {selectedImage && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text variant="labelSmall" color={colors.text.tertiary}>
+                  SIZE PRESET
+                </Text>
+              </View>
+              {presetOptions.map((option) => (
+                <Pressable
+                  key={option.value}
+                  style={[
+                    styles.presetOption,
+                    preset === option.value && styles.presetOptionSelected,
+                  ]}
+                  onPress={() => setPreset(option.value)}
+                  testID={`preset-${option.value}`}
                 >
-                  Select Image
-                </Button>
-              </View>
+                  <View style={styles.presetIconContainer}>
+                    <Ionicons
+                      name={option.icon}
+                      size={24}
+                      color={preset === option.value ? colors.primary[500] : colors.text.secondary}
+                    />
+                  </View>
+                  <Text
+                    variant="body"
+                    color={preset === option.value ? colors.primary[500] : colors.text.primary}
+                  >
+                    {option.label}
+                  </Text>
+                  {preset === option.value && (
+                    <Ionicons name="checkmark-circle" size={24} color={colors.primary[500]} />
+                  )}
+                </Pressable>
+              ))}
+            </View>
+          )}
 
-              {/* Info Card */}
-              <View style={styles.infoCard}>
-                <Ionicons name="information-circle" size={24} color={colors.info[500]} />
-                <Text variant="caption" color={colors.text.secondary} style={styles.infoText}>
-                  Interactive Crop: Drag corners to adjust crop area. Supports all standard image
-                  formats (JPG, PNG, etc.)
+          {/* Custom Dimensions */}
+          {selectedImage && preset === 'custom' && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text variant="labelSmall" color={colors.text.tertiary}>
+                  CUSTOM DIMENSIONS (PX)
                 </Text>
               </View>
-            </View>
-          )}
-
-          {/* Crop View */}
-          {viewMode === 'crop' && selectedImage && (
-            <View style={styles.section}>
-              <View style={styles.cropContainer}>
-                <ImageCropper imageUri={selectedImage.uri} onCropChange={setCropArea} />
-              </View>
-
-              <View style={styles.instructionsCard}>
-                <Ionicons name="hand-left-outline" size={20} color={colors.primary[500]} />
-                <View style={styles.instructionsText}>
-                  <Text variant="caption" color={colors.text.secondary}>
-                    • Drag corners to resize crop area{'\n'}• Tap inside to move crop area{'\n'}•
-                    Use grid for alignment
+              <View style={styles.dimensionInputs}>
+                <View style={styles.dimensionInput}>
+                  <Text variant="caption" color={colors.text.tertiary} style={styles.inputLabel}>
+                    Width
                   </Text>
-                </View>
-              </View>
-            </View>
-          )}
-
-          {/* Processing State */}
-          {processingState.status === 'processing' && (
-            <View style={styles.section}>
-              <ProgressIndicator state={processingState} />
-            </View>
-          )}
-
-          {/* Result View */}
-          {viewMode === 'result' &&
-            processingState.status === 'complete' &&
-            processingState.outputUri && (
-              <View style={styles.section}>
-                <View style={styles.resultCard}>
-                  <Image
-                    source={{ uri: processingState.outputUri }}
-                    style={styles.resultImage}
-                    resizeMode="contain"
+                  <TextInput
+                    style={styles.input}
+                    value={customWidth}
+                    onChangeText={setCustomWidth}
+                    keyboardType="numeric"
+                    placeholder="Auto"
+                    placeholderTextColor={colors.text.tertiary}
                   />
                 </View>
-
-                <View style={styles.successCard}>
-                  <Ionicons name="checkmark-circle" size={24} color={colors.success[500]} />
-                  <Text variant="body" color={colors.success[700]} style={styles.successText}>
-                    {processingState.message}
+                <Text variant="h3" color={colors.text.tertiary}>
+                  ×
+                </Text>
+                <View style={styles.dimensionInput}>
+                  <Text variant="caption" color={colors.text.tertiary} style={styles.inputLabel}>
+                    Height
                   </Text>
+                  <TextInput
+                    style={styles.input}
+                    value={customHeight}
+                    onChangeText={setCustomHeight}
+                    keyboardType="numeric"
+                    placeholder="Auto"
+                    placeholderTextColor={colors.text.tertiary}
+                  />
                 </View>
               </View>
-            )}
-
-          {/* Error State */}
-          {processingState.status === 'error' && (
-            <View style={styles.section}>
-              <View style={styles.errorCard}>
-                <Ionicons name="alert-circle" size={24} color={colors.error[500]} />
-                <Text variant="body" color={colors.error[700]} style={styles.errorText}>
-                  {processingState.message}
+              <Pressable
+                style={styles.aspectRatioToggle}
+                onPress={() => setMaintainAspectRatio(!maintainAspectRatio)}
+              >
+                <Ionicons
+                  name={maintainAspectRatio ? 'checkbox' : 'square-outline'}
+                  size={24}
+                  color={maintainAspectRatio ? colors.primary[500] : colors.text.tertiary}
+                />
+                <Text variant="body" color={colors.text.secondary} style={styles.aspectRatioText}>
+                  Maintain aspect ratio
                 </Text>
-              </View>
+              </Pressable>
+            </View>
+          )}
+
+          {/* Progress */}
+          {processingState.status !== 'idle' && (
+            <View style={styles.section}>
+              <ProgressIndicator state={processingState} testID="progress" />
             </View>
           )}
         </ScrollView>
 
         {/* Footer */}
         <View style={styles.footer}>
-          {viewMode === 'crop' && selectedImage && (
+          {canSave ? (
             <Button
               variant="primary"
               size="lg"
               fullWidth
-              leftIcon={<Ionicons name="checkmark" size={20} color={colors.surface} />}
-              onPress={handleApplyCrop}
-              disabled={processingState.status === 'processing'}
-              testID="apply-crop-button"
+              leftIcon={<Ionicons name="share-outline" size={20} color={colors.surface} />}
+              onPress={handleSave}
+              testID="save-button"
             >
-              Apply Crop
+              Save & Share
             </Button>
-          )}
-
-          {viewMode === 'result' && processingState.status === 'complete' && (
-            <View style={styles.actionButtons}>
-              <Button
-                variant="outline"
-                size="lg"
-                style={styles.actionButton}
-                leftIcon={<Ionicons name="refresh" size={20} color={colors.primary[500]} />}
-                onPress={handleCropAnother}
-                testID="crop-another-button"
-              >
-                Crop Another
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                style={styles.actionButton}
-                leftIcon={<Ionicons name="download-outline" size={20} color={colors.surface} />}
-                onPress={handleSave}
-                testID="save-button"
-              >
-                Save
-              </Button>
-            </View>
+          ) : (
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              leftIcon={<Ionicons name="resize-outline" size={20} color={colors.surface} />}
+              onPress={handleResize}
+              disabled={!canResize}
+              loading={processingState.status === 'processing'}
+              testID="resize-button"
+            >
+              Resize Image
+            </Button>
           )}
         </View>
       </View>
@@ -311,8 +370,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral[100],
   },
   backButton: {
     padding: spacing[2],
@@ -331,98 +388,67 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: spacing[4],
-    marginTop: spacing[4],
-  },
-  uploadCard: {
-    backgroundColor: colors.neutral[50],
-    borderRadius: spacing[3],
-    borderWidth: 2,
-    borderColor: colors.neutral[200],
-    borderStyle: 'dashed',
-    padding: spacing[6],
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 300,
-  },
-  uploadText: {
-    textAlign: 'center',
-    marginTop: spacing[3],
     marginBottom: spacing[4],
   },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: spacing[3],
-    borderRadius: spacing[2],
-    backgroundColor: colors.info[50],
-    borderWidth: 1,
-    borderColor: colors.info[200],
-    marginTop: spacing[4],
+  sectionHeader: {
+    marginBottom: spacing[2],
   },
-  infoText: {
-    marginLeft: spacing[2],
-    flex: 1,
-  },
-  cropContainer: {
-    backgroundColor: colors.neutral[900],
-    borderRadius: spacing[2],
-    padding: spacing[3],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  instructionsCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: spacing[3],
-    borderRadius: spacing[2],
-    backgroundColor: colors.primary[50],
-    borderWidth: 1,
-    borderColor: colors.primary[200],
-    marginTop: spacing[4],
-  },
-  instructionsText: {
-    marginLeft: spacing[2],
-    flex: 1,
-  },
-  resultCard: {
+  imagePreview: {
     backgroundColor: colors.neutral[50],
     borderRadius: spacing[2],
-    padding: spacing[3],
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.neutral[200],
+    padding: spacing[4],
+    alignItems: 'center',
   },
-  resultImage: {
-    width: '100%',
-    height: 400,
-    borderRadius: spacing[2],
+  imageName: {
+    marginTop: spacing[2],
+    textAlign: 'center',
   },
-  successCard: {
+  presetOption: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing[3],
     borderRadius: spacing[2],
-    backgroundColor: colors.success[50],
     borderWidth: 1,
-    borderColor: colors.success[200],
-    marginTop: spacing[4],
+    borderColor: colors.neutral[200],
+    backgroundColor: colors.surface,
+    marginBottom: spacing[2],
   },
-  successText: {
-    marginLeft: spacing[2],
-    flex: 1,
+  presetOptionSelected: {
+    borderColor: colors.primary[500],
+    backgroundColor: colors.primary[50],
   },
-  errorCard: {
+  presetIconContainer: {
+    marginRight: spacing[3],
+  },
+  dimensionInputs: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing[3],
-    borderRadius: spacing[2],
-    backgroundColor: colors.error[50],
-    borderWidth: 1,
-    borderColor: colors.error[200],
+    justifyContent: 'space-between',
+    marginBottom: spacing[3],
   },
-  errorText: {
-    marginLeft: spacing[2],
+  dimensionInput: {
     flex: 1,
+  },
+  inputLabel: {
+    marginBottom: spacing[1],
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.neutral[200],
+    borderRadius: spacing[2],
+    padding: spacing[3],
+    fontSize: 16,
+    color: colors.text.primary,
+    backgroundColor: colors.surface,
+  },
+  aspectRatioToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aspectRatioText: {
+    marginLeft: spacing[2],
   },
   footer: {
     paddingHorizontal: spacing[4],
@@ -430,13 +456,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderTopWidth: 1,
     borderTopColor: colors.neutral[100],
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: spacing[2],
-  },
-  actionButton: {
-    flex: 1,
   },
 });
 
