@@ -141,6 +141,71 @@ export function AudioToTextScreen() {
     setViewMode('recorded');
   }, [player]);
 
+  const handleAutoTranscribeFile = useCallback(
+    async (audioUri: string) => {
+      if (!recognitionAvailable) {
+        Alert.alert(
+          'Feature Unavailable',
+          'Automatic transcription requires a development build.\n\nThis feature is not available in Expo Go. Please build the app with "npx expo run:ios" or "npx expo run:android".\n\nYou can still transcribe manually by typing while playing the audio.'
+        );
+        return;
+      }
+
+      try {
+        const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+        if (!granted) {
+          Alert.alert(
+            'Permission Required',
+            'Please grant microphone permission for automatic transcription'
+          );
+          return;
+        }
+
+        // Clear previous transcription
+        setTranscriptionText('');
+        setIsRecognizing(true);
+        setViewMode('recognizing');
+
+        // Start speech recognition
+        await ExpoSpeechRecognitionModule.start({
+          lang: 'en-US',
+          interimResults: true,
+          maxAlternatives: 1,
+          continuous: true,
+          requiresOnDeviceRecognition: false,
+          addsPunctuation: true,
+          contextualStrings: [],
+        });
+
+        // Play the audio file so recognition can transcribe it
+        setPlayerSource(audioUri);
+        player.play();
+
+        // Monitor playback to stop recognition when audio ends
+        const checkPlayback = setInterval(() => {
+          if (!player.playing) {
+            clearInterval(checkPlayback);
+            // Stop recognition when audio finishes
+            setTimeout(() => {
+              try {
+                ExpoSpeechRecognitionModule.stop();
+                setIsRecognizing(false);
+                setViewMode('recorded');
+              } catch {
+                // Ignore errors
+              }
+            }, 1000); // Small delay to capture final words
+          }
+        }, 100);
+      } catch {
+        setIsRecognizing(false);
+        setViewMode('recorded');
+        Alert.alert(t('common.error'), 'Failed to start automatic transcription');
+      }
+    },
+    [recognitionAvailable, player]
+  );
+
   const handlePickAudioFile = useCallback(async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -153,11 +218,19 @@ export function AudioToTextScreen() {
         setRecordingUri(file.uri);
         setSelectedFileName(file.name);
         setViewMode('recorded');
+
+        // Automatically start transcribing the uploaded audio file
+        if (recognitionAvailable) {
+          // Small delay to ensure state is set
+          setTimeout(() => {
+            handleAutoTranscribeFile(file.uri);
+          }, 500);
+        }
       }
     } catch {
       Alert.alert(t('common.error'), 'Failed to pick audio file');
     }
-  }, []);
+  }, [recognitionAvailable, handleAutoTranscribeFile]);
 
   const handleAutoTranscribe = useCallback(async () => {
     if (!recognitionAvailable) {
@@ -275,13 +348,13 @@ export function AudioToTextScreen() {
           <View style={styles.section}>
             <Text variant="body" color={colors.text.secondary}>
               {viewMode === 'idle'
-                ? 'Record audio or upload an audio file to transcribe'
+                ? 'Record audio or upload a file - uploaded files are auto-transcribed!'
                 : viewMode === 'recording'
                   ? 'Recording in progress... Tap stop when finished'
                   : viewMode === 'recognizing'
                     ? 'Listening and transcribing... Speak clearly'
                     : selectedFileName
-                      ? `Selected: ${selectedFileName}`
+                      ? `Transcribing: ${selectedFileName}`
                       : 'Use auto transcribe or type manually'}
             </Text>
           </View>
@@ -446,8 +519,9 @@ export function AudioToTextScreen() {
               <View style={styles.infoCard}>
                 <Ionicons name="information-circle" size={24} color={colors.info[500]} />
                 <Text variant="caption" color={colors.text.secondary} style={styles.infoText}>
-                  Two transcription options:{'\n'}• Auto Transcribe: Speak live and text appears
-                  automatically (requires dev build){'\n'}• Manual: Type while playing the audio
+                  {selectedFileName
+                    ? 'Uploaded audio files are automatically transcribed when you select them (requires dev build). Or type manually.'
+                    : 'Two transcription options:\n• Auto Transcribe: Speak live and text appears automatically (requires dev build)\n• Manual: Type while playing the audio'}
                 </Text>
               </View>
             </View>
